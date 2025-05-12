@@ -2,6 +2,7 @@ import pygame
 import sys
 
 from function.JsonManager import JsonManager
+from function.AssetManager import AssetManager
 from display.main import Display
 from function.PlayerInput import PlayerInput
 
@@ -12,6 +13,7 @@ class Main:
         pygame.init()
 
         self.JsonManager = JsonManager(self)
+        self.AssetManager = AssetManager(self)
         
         self.Disp = Display(self)
         self.PI = PlayerInput(self)
