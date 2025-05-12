@@ -4,16 +4,16 @@ class Game:
 
     def __init__(self,m):
 
-        self.cells = {
-            "a":[20,10,0,0,0,0,11,21],
-            "b":[30,10,0,0,0,0,11,31],
-            "c":[40,10,0,0,0,0,11,41],
-            "d":[50,10,0,0,0,0,11,51],
-            "e":[60,10,0,0,0,0,11,61],
-            "f":[40,10,0,0,0,0,11,41],
-            "g":[30,10,0,0,0,0,11,31],
-            "h":[20,10,0,0,0,0,11,21]
-        }
+        self.cells = [
+            ["white_rook","white_pawn",None,None,None,None,"black_pawn","black_rook"],
+            ["white_knight","white_pawn",None,None,None,None,"black_pawn","black_knight"],
+            ["white_bishop","white_pawn",None,None,None,None,"black_pawn","black_bishop"],
+            ["white_queen","white_pawn",None,None,None,None,"black_pawn","black_queen"],
+            ["white_king","white_pawn",None,None,None,None,"black_pawn","black_king"],
+            ["white_bishop","white_pawn",None,None,None,None,"black_pawn","black_bishop"],
+            ["white_knight","white_pawn",None,None,None,None,"black_pawn","black_knight"],
+            ["white_rook","white_pawn",None,None,None,None,"black_pawn","black_rook"]
+        ]
 
     def key_input(self,m):
 

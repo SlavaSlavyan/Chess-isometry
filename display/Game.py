@@ -66,3 +66,7 @@ class Game:
             color = m.Disp.colors['Game']['dark_cell']
         
         pygame.draw.polygon(m.Disp.screen,color,points)
+
+        if m.PI.Game.cells[selected_cell[0]][selected_cell[1]] != None:
+            m.AssetManager.img[m.PI.Game.cells[selected_cell[0]][selected_cell[1]]] = pygame.transform.scale(m.AssetManager.img[m.PI.Game.cells[selected_cell[0]][selected_cell[1]]], (64*z, 64*z))
+            m.Disp.screen.blit(m.AssetManager.img[m.PI.Game.cells[selected_cell[0]][selected_cell[1]]],position)

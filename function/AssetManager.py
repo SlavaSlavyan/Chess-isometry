@@ -8,12 +8,11 @@ class AssetManager:
         self.loadimg(m)
     
     def loadimg(self,m):
-        
+
         self.img = {}
-        
-        images = [f for f in Path('data\\assets').iterdir() if f.is_file() and f.suffix.lower() == '.png']
-        
-        for img in images:
-            self.img[img] = pygame.image.load(img)
-        
-        print(self.img)
+
+        for png_file in Path('data\\assets').glob('*.png'):
+            self.img[png_file.stem] = str(png_file)
+
+        for key,value in self.img.items():
+            self.img[key] = pygame.image.load(value)
