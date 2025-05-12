@@ -12,6 +12,7 @@ class Main:
         pygame.init()
 
         self.JsonManager = JsonManager(self)
+        
         self.Disp = Display(self)
         self.PI = PlayerInput(self)
 

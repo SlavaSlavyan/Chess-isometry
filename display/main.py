@@ -22,7 +22,6 @@ class Display:
         self.fps = self.clock.get_fps()
         self.width, self.height = self.screen.get_size()
 
-        self.screen.fill((0,0,0))
         self.Game.main(m)
 
     def reload_screen_mode(self,m):

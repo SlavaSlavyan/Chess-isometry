@@ -4,20 +4,16 @@ class Game:
 
     def __init__(self,m):
 
-        self.new_rotate = [0,0]
-
-    def main(self,m):
-        pass
-
-    #def mouse_input(self,m):
-    #    if m.PI.MI.mouse['rt']:
-    #        self.new_rotate = [
-    #            m.PI.MI.last_mouse_pos[0] - m.PI.MI.mouse_pos[0],
-    #            m.PI.MI.last_mouse_pos[1] - m.PI.MI.mouse_pos[1]
-    #        ]
-    #    elif self.new_rotate != [0,0]:
-    #       m.Disp.Game.rotate = [m.Disp.Game.rotate[0]-self.new_rotate[0],m.Disp.Game.rotate[1]-self.new_rotate[1]]
-    #        self.new_rotate = [0,0]
+        self.cells = {
+            "a":[20,10,0,0,0,0,11,21],
+            "b":[30,10,0,0,0,0,11,31],
+            "c":[40,10,0,0,0,0,11,41],
+            "d":[50,10,0,0,0,0,11,51],
+            "e":[60,10,0,0,0,0,11,61],
+            "f":[40,10,0,0,0,0,11,41],
+            "g":[30,10,0,0,0,0,11,31],
+            "h":[20,10,0,0,0,0,11,21]
+        }
 
     def key_input(self,m):
 

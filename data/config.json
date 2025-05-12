@@ -4,5 +4,7 @@
         1200,
         800
     ],
-    "them": "base"
+    "them": "base",
+    "zoom": 1,
+    "f3": true
 }

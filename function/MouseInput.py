@@ -39,6 +39,14 @@ class MouseInput:
 
                 self.mouse['rt'] = False
                 self.mouse_release['rt'] = True
+        
+        if event.type == pygame.MOUSEWHEEL:
+            
+            if event.y > 0:
+                m.config['zoom'] += 0.1
+            
+            if event.y < 0:
+                m.config['zoom'] -= 0.1
     
     def update(self,m):
 
