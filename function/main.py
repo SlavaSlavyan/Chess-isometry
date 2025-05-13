@@ -29,6 +29,7 @@ class Main:
             self.Disp.clock.tick(60)
     
     def stop(self):
-
+        
+        self.JsonManager.save("data\\config",self.config)
         pygame.quit()
         sys.exit()

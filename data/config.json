@@ -1,10 +1,10 @@
 {
-    "fullscreen": true,
+    "fullscreen": false,
     "start-size": [
         1200,
         800
     ],
     "them": "base",
-    "zoom": 1.5,
+    "zoom": 1.0,
     "f3": false
 }
