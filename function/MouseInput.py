@@ -41,6 +41,8 @@ class MouseInput:
                 self.mouse_release['rt'] = True
         
         if event.type == pygame.MOUSEWHEEL:
+
+            m.AssetManager.check_new_zoom(m)
             
             if event.y > 0:
                 m.config['zoom'] = round(m.config['zoom'] + 0.1, 1)

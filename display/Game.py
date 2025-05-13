@@ -1,5 +1,6 @@
 import pygame
 import math
+import copy
 
 class Game:
 
@@ -35,24 +36,49 @@ class Game:
         z = m.config['zoom']
         
         board = self.square(m,(m.Disp.width//2,m.Disp.height//2),400)
-        white = self.square(m,(m.Disp.width//2,m.Disp.height//2),282)
+        back = self.square(m,(m.Disp.width//2,m.Disp.height//2),283)
 
         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],board)
         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],board,1)
-        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],white)
-        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],white,3)
-    
-    def cells(self,m):
-        
-        z = m.config['zoom']
-        
+        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['dark_cell'],back)
+
         for y in range(8):
             for x in range(8):
 
                 if (x+y)%2 == 1:
                 
-                    pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['dark_cell'],self.square(m,m.PI.Game.cells[x][y]['pos'],50/(math.pi/2.2)))
+                    pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],self.square(m,m.PI.Game.cells[x][y]['pos'],50/(math.pi/2.2)))
+        
+        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
+    
+    def cells(self,m):
+        
+        z = m.config['zoom']
 
-                    if m.PI.Game.cells[x][y]['value'] != "empty":
-                        m.AssetManager.img[m.PI.Game.cells[x][y]['value']] = pygame.transform.scale(m.AssetManager.img[m.PI.Game.cells[x][y]['value']], (64*z, 64*z))
-                        m.Disp.screen.blit(m.AssetManager.img[m.PI.Game.cells[x][y]['value']],m.PI.Game.cells[x][y]['pos'])
+        images = m.AssetManager.img
+        cells = m.PI.Game.cells
+
+        if self.rotate[0] > 90 or self.rotate[0] < -90:
+            Y = range(8)
+        else:
+            Y = range(7,-1,-1)
+
+        if self.rotate[0] > 0:
+            X = range(7,-1,-1)
+        else:
+            X = range(8)
+
+        for y in Y:
+            for x in X:
+
+                if cells[x][y]['value'] in images:
+
+                    image = images[cells[x][y]['value']]
+                    image = pygame.transform.scale(image, (64*z, 64*z))
+                    image_size = image.get_size()
+                    m.Disp.screen.blit(image,[cells[x][y]['pos'][0]-image_size[0]/2,cells[x][y]['pos'][1]-image_size[1]])
+                
+                if x == 1 and y == 1:
+
+                    #pygame.draw.circle(m.Disp.screen,(255,0,0),cells[x][y]['pos'],5,1)
+                    pass

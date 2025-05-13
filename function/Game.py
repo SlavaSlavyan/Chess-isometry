@@ -6,14 +6,14 @@ class Game:
     def __init__(self,m):
 
         self.cells = [
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
-            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}]
+            [{"value":"white_rook","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_rook","pos":[]}],
+            [{"value":"white_knight","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_knight","pos":[]}],
+            [{"value":"white_bishop","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_bishop","pos":[]}],
+            [{"value":"white_queen","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_queen","pos":[]}],
+            [{"value":"white_king","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_king","pos":[]}],
+            [{"value":"white_bishop","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_bishop","pos":[]}],
+            [{"value":"white_knight","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_knight","pos":[]}],
+            [{"value":"white_rook","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_rook","pos":[]}]
         ]
     
     def main(self,m):

@@ -50,7 +50,8 @@ class Display:
             "F3 mode can reduse much lags, please use this mode only in debug :)","",
             "[GLOBAL]",
             f" screen: {self.width}x{self.height}",
-            f" fps: {round(self.fps)}"
+            f" fps: {round(self.fps)}",
+            f" rotate: {m.Disp.Game.rotate}"
         ]
         
         config = ["","[CONFIG]"]

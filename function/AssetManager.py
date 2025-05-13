@@ -6,6 +6,7 @@ class AssetManager:
     def __init__(self,m):
  
         self.loadimg(m)
+        self.old_zoom = m.config['zoom']
     
     def loadimg(self,m):
 
@@ -16,3 +17,10 @@ class AssetManager:
 
         for key,value in self.img.items():
             self.img[key] = pygame.image.load(value)
+    
+    def check_new_zoom(self,m):
+
+        if self.old_zoom != m.config['zoom']:
+
+            self.loadimg(m)
+            self.old_zoom = m.config['zoom']
