@@ -43,10 +43,10 @@ class MouseInput:
         if event.type == pygame.MOUSEWHEEL:
             
             if event.y > 0:
-                m.config['zoom'] += 0.1
+                m.config['zoom'] = round(m.config['zoom'] + 0.1, 1)
             
             if event.y < 0:
-                m.config['zoom'] -= 0.1
+                m.config['zoom'] = round(m.config['zoom'] - 0.1, 1)
     
     def update(self,m):
 

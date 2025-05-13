@@ -24,7 +24,7 @@ class Main:
 
             self.PI.main(self)
             self.Disp.main(self)
-
+            
             pygame.display.flip()
             self.Disp.clock.tick(60)
     

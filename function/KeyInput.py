@@ -32,3 +32,10 @@ class KeyInput:
                 if event.key == key['id']:
                     key['value'] = False
                     key['release'] = True
+    
+    def update(self,m):
+
+        for key in self.keys.values():
+
+            key['press'] = False
+            key['release'] = False

@@ -17,13 +17,13 @@ class Game:
 
     def key_input(self,m):
 
-        if m.PI.KI.keys['up']['value']:
+        if m.PI.KI.keys['up']['value'] or m.PI.KI.keys['w']['value']:
             m.Disp.Game.rotate[1] += 1
-        if m.PI.KI.keys['down']['value']:
+        if m.PI.KI.keys['down']['value'] or m.PI.KI.keys['s']['value']:
             m.Disp.Game.rotate[1] -= 1
-        if m.PI.KI.keys['left']['value']:
+        if m.PI.KI.keys['left']['value'] or m.PI.KI.keys['a']['value']:
             m.Disp.Game.rotate[0] -= 1
-        if m.PI.KI.keys['right']['value']:
+        if m.PI.KI.keys['right']['value'] or m.PI.KI.keys['d']['value']:
             m.Disp.Game.rotate[0] += 1
         
         for i in range(2):

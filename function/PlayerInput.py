@@ -26,8 +26,16 @@ class PlayerInput:
             self.MI.main(m,event)
 
         self.logic(m) 
-        self.MI.update(m)
+        
+        self.update_input(m)
     
     def logic(self,m):
         
+        m.Disp.debug_mode_press_check(m)
+        m.Disp.fullscreen_press_check(m)
         self.Game.key_input(m)
+    
+    def update_input(self,m):
+        
+        self.KI.update(m)
+        self.MI.update(m)
