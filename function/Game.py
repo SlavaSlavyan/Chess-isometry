@@ -1,19 +1,43 @@
 import pygame
+import math
 
 class Game:
 
     def __init__(self,m):
 
         self.cells = [
-            ["white_rook","white_pawn",None,None,None,None,"black_pawn","black_rook"],
-            ["white_knight","white_pawn",None,None,None,None,"black_pawn","black_knight"],
-            ["white_bishop","white_pawn",None,None,None,None,"black_pawn","black_bishop"],
-            ["white_queen","white_pawn",None,None,None,None,"black_pawn","black_queen"],
-            ["white_king","white_pawn",None,None,None,None,"black_pawn","black_king"],
-            ["white_bishop","white_pawn",None,None,None,None,"black_pawn","black_bishop"],
-            ["white_knight","white_pawn",None,None,None,None,"black_pawn","black_knight"],
-            ["white_rook","white_pawn",None,None,None,None,"black_pawn","black_rook"]
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}],
+            [{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]}]
         ]
+    
+    def main(self,m):
+
+        self.key_input(m)
+        self.createpos(m)
+
+    def createpos(self,m):
+
+        z = m.config['zoom']
+        
+        for y in range(8):
+            for x in range(8):
+                
+                offset_x = x * 50*z - 175*z
+                offset_y = y * 50*z - 175*z
+
+                rotated_x = offset_x * math.cos(math.pi*m.Disp.Game.rotate[0]/180) - offset_y * math.sin(math.pi*m.Disp.Game.rotate[0]/180)
+                rotated_y = (offset_x * math.sin(math.pi*m.Disp.Game.rotate[0]/180) + offset_y * math.cos(math.pi*m.Disp.Game.rotate[0]/180))*math.sin(math.pi*m.Disp.Game.rotate[1]/180)
+
+                draw_x = int(m.Disp.width//2 + rotated_x)
+                draw_y = int(m.Disp.height//2 + rotated_y)
+
+                self.cells[x][y]['pos'] = [draw_x,draw_y]
 
     def key_input(self,m):
 
@@ -33,8 +57,6 @@ class Game:
             
             if m.Disp.Game.rotate[i] < -180:
                 m.Disp.Game.rotate[i] += 360
-        
-        print(m.Disp.Game.rotate)
     
     def is_point_in_polygon(point, polygon):
         x, y = point

@@ -33,7 +33,7 @@ class PlayerInput:
         
         m.Disp.debug_mode_press_check(m)
         m.Disp.fullscreen_press_check(m)
-        self.Game.key_input(m)
+        self.Game.main(m)
     
     def update_input(self,m):
         
