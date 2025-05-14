@@ -15,11 +15,28 @@ class Game:
             [{"value":"white_knight","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_knight","pos":[]}],
             [{"value":"white_rook","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_rook","pos":[]}]
         ]
+        
+        for line in self.cells:
+            for cell in line:
+                cell['points'] = []
+
+        self.selected_piece = None
     
     def main(self,m):
 
         self.key_input(m)
         self.createpos(m)
+        
+        for x in range(8):
+            for y in range(8):
+                
+                if self.cells[x][y]['value'] != "empty":
+                    
+                    if m.PI.MI.mouse_click['lt']:
+                        
+                        if self.is_point_in_polygon(m.PI.MI.mouse_pos,self.cells[x][y]['points']):
+                            
+                            self.selected_piece = [x,y]
 
     def createpos(self,m):
 
@@ -38,6 +55,7 @@ class Game:
                 draw_y = int(m.Disp.height//2 + rotated_y)
 
                 self.cells[x][y]['pos'] = [draw_x,draw_y]
+                self.cells[x][y]['points'] = m.Disp.Game.square(m,self.cells[x][y]['pos'],50/(math.pi/2.2))
 
     def key_input(self,m):
 
@@ -58,7 +76,8 @@ class Game:
             if m.Disp.Game.rotate[i] < -180:
                 m.Disp.Game.rotate[i] += 360
     
-    def is_point_in_polygon(point, polygon):
+    def is_point_in_polygon(self,point:tuple,polygon:list) -> bool:
+        
         x, y = point
         n = len(polygon)
         inside = False

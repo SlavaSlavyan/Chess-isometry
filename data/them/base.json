@@ -6,6 +6,7 @@
         "bg":[40,44,52],
         "dark_cell":[33,37,43],
         "light_cell":[204,204,204],
-        "chessboard":[51,56,66]
+        "chessboard":[51,56,66],
+        "selected_cell":[229,192,123]
     }
 }

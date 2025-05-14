@@ -59,12 +59,17 @@ class Display:
             config.append(f" {key}: {value}")
         
         keys = ["","[KEYS]"]
-        for key,value in m.PI.KI.keys.items():
-                    
+        for key,value in m.PI.KI.keys.items():        
             keys.append(f" {key}: {value['value']}")
+        
+        mouse = ["","[MOUSE]",
+                f"  pos: {m.PI.MI.mouse_pos}",
+                f"  lastpos: {m.PI.MI.last_mouse_pos}",
+                f"  status: {m.PI.MI.mouse}"]
             
         f3context.extend(config)
         f3context.extend(keys)
+        f3context.extend(mouse)
         
         for line in range(len(f3context)):
             text = self.f3font.render(str(f3context[line]), False, m.Disp.colors['Global']['f3_text'])

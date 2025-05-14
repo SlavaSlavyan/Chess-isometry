@@ -6,6 +6,7 @@ class Game:
     def __init__(self,m):
 
         self.rotate = [0,-90]
+        self.pulse = 0
 
     def main(self,m):
         
@@ -21,6 +22,8 @@ class Game:
         if m.config['f3']:
             pygame.draw.line(m.Disp.screen,(0,255,0),(m.Disp.width//2,0),(m.Disp.width//2,m.Disp.height))
             pygame.draw.line(m.Disp.screen,(0,0,255),(0,m.Disp.height//2),(m.Disp.width,m.Disp.height//2))
+        
+        self.pulse += 0.05
     
     def square(self,m,center:tuple,size:float) -> list:
         
@@ -54,9 +57,22 @@ class Game:
 
                     if (x+y)%2 == 1:
                     
-                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],self.square(m,m.PI.Game.cells[x][y]['pos'],50/(math.pi/2.2)))
+                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],m.PI.Game.cells[x][y]['points'])
+                    
+                    if m.PI.Game.selected_piece == [x,y]:
+                        
+                        polygon_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
+                        polygon_surface.fill((0, 0, 0, 0))
+                        
+                        
+                        color = m.Disp.colors['Game']['selected_cell']
+                        color = (color[0],color[1],color[2],round(190+63*math.sin(self.pulse)))
+                        
+                        pygame.draw.polygon(polygon_surface,color,m.PI.Game.cells[x][y]['points'])
+                        m.Disp.screen.blit(polygon_surface, (0, 0))
+                        
             
-            pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
+            #pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
         
     def cells(self,m):
         
@@ -81,7 +97,7 @@ class Game:
                 if cells[x][y]['value'] in images:
 
                     image = images[cells[x][y]['value']]
-                    image = pygame.transform.scale(image, (64*z, 64*z))
+                    image = pygame.transform.scale(image, (50*z, 50*z))
                     if self.rotate[1] < -90 or self.rotate[1] > 90:
                         image = pygame.transform.flip(image, False, True)
                     image_size = image.get_size()
