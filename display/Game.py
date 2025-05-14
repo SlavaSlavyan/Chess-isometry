@@ -1,6 +1,5 @@
 import pygame
 import math
-import copy
 
 class Game:
 
@@ -12,8 +11,12 @@ class Game:
         
         m.Disp.screen.fill(m.Disp.colors['Game']['bg'])
         
-        self.chessboard(m)
-        self.cells(m)
+        if self.rotate[1] < 0:
+            self.chessboard(m)
+            self.cells(m)
+        else:
+            self.cells(m)
+            self.chessboard(m)
         
         if m.config['f3']:
             pygame.draw.line(m.Disp.screen,(0,255,0),(m.Disp.width//2,0),(m.Disp.width//2,m.Disp.height))
@@ -36,21 +39,25 @@ class Game:
         z = m.config['zoom']
         
         board = self.square(m,(m.Disp.width//2,m.Disp.height//2),400)
-        back = self.square(m,(m.Disp.width//2,m.Disp.height//2),283)
+        boardcolor = m.Disp.colors['Game']['bg']
+        if self.rotate[1] < 0:
+            back = self.square(m,(m.Disp.width//2,m.Disp.height//2),283)
+            boardcolor = m.Disp.colors['Game']['chessboard']
 
-        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],board)
+        pygame.draw.polygon(m.Disp.screen,boardcolor,board)
         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],board,1)
-        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['dark_cell'],back)
+        if self.rotate[1] < 0:
+            pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['dark_cell'],back)
 
-        for y in range(8):
-            for x in range(8):
+            for y in range(8):
+                for x in range(8):
 
-                if (x+y)%2 == 1:
-                
-                    pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],self.square(m,m.PI.Game.cells[x][y]['pos'],50/(math.pi/2.2)))
+                    if (x+y)%2 == 1:
+                    
+                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],self.square(m,m.PI.Game.cells[x][y]['pos'],50/(math.pi/2.2)))
+            
+            pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
         
-        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
-    
     def cells(self,m):
         
         z = m.config['zoom']
@@ -75,10 +82,14 @@ class Game:
 
                     image = images[cells[x][y]['value']]
                     image = pygame.transform.scale(image, (64*z, 64*z))
+                    if self.rotate[1] < -90 or self.rotate[1] > 90:
+                        image = pygame.transform.flip(image, False, True)
                     image_size = image.get_size()
-                    m.Disp.screen.blit(image,[cells[x][y]['pos'][0]-image_size[0]/2,cells[x][y]['pos'][1]-image_size[1]])
+                    pos = [cells[x][y]['pos'][0]-image_size[0]/2,cells[x][y]['pos'][1]-image_size[1] + image_size[1]/2*(self.rotate[1]/-90)]
+                    m.Disp.screen.blit(image,pos)
                 
-                if x == 1 and y == 1:
+                if m.config['f3']:
 
-                    #pygame.draw.circle(m.Disp.screen,(255,0,0),cells[x][y]['pos'],5,1)
-                    pass
+                    pygame.draw.circle(m.Disp.screen,(255,255,0),cells[x][y]['pos'],5,1)
+                    if cells[x][y]['value'] in images:pygame.draw.circle(m.Disp.screen,(255,0,255),(cells[x][y]['pos'][0],cells[x][y]['pos'][1] + image_size[1]/2*(self.rotate[1]/-90)),5,1)
+                    pygame.draw.circle(m.Disp.screen,(0,255,255),pos,2,1)
