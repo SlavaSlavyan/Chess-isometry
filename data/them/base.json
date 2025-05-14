@@ -7,6 +7,8 @@
         "dark_cell":[33,37,43],
         "light_cell":[204,204,204],
         "chessboard":[51,56,66],
-        "selected_cell":[229,192,123]
+        "selected_cell":[229,192,123],
+        "move_cell":[0,255,0],
+        "attack_cell":[255,0,0]
     }
 }

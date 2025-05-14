@@ -19,8 +19,9 @@ class Game:
         for line in self.cells:
             for cell in line:
                 cell['points'] = []
-
-        self.selected_piece = None
+                cell['status'] = "none"
+        
+        self.selected_cell = None
     
     def main(self,m):
 
@@ -29,6 +30,8 @@ class Game:
         
         for x in range(8):
             for y in range(8):
+
+                self.cells[x][y]['status'] = None
                 
                 if self.cells[x][y]['value'] != "empty":
                     
@@ -36,7 +39,10 @@ class Game:
                         
                         if self.is_point_in_polygon(m.PI.MI.mouse_pos,self.cells[x][y]['points']):
                             
-                            self.selected_piece = [x,y]
+                            self.selected_cell = [x,y]
+                            
+        if self.selected_cell:
+            self.cells[self.selected_cell[0]][self.selected_cell[1]]['status'] = 'selected'
 
     def createpos(self,m):
 

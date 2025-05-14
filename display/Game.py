@@ -54,23 +54,18 @@ class Game:
 
             for y in range(8):
                 for x in range(8):
+                        
+                    if m.PI.Game.cells[x][y]['status'] == 'selected':
+                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['selected_cell'],m.PI.Game.cells[x][y]['points'])
+                    
+                    elif m.PI.Game.cells[x][y]['status'] == 'move':
+                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['move_cell'],m.PI.Game.cells[x][y]['points'])
+                    
+                    elif m.PI.Game.cells[x][y]['status'] == 'attack':
+                        pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['attack_cell'],m.PI.Game.cells[x][y]['points'])
 
-                    if (x+y)%2 == 1:
-                    
+                    elif (x+y)%2 == 1:
                         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['light_cell'],m.PI.Game.cells[x][y]['points'])
-                    
-                    if m.PI.Game.selected_piece == [x,y]:
-                        
-                        polygon_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
-                        polygon_surface.fill((0, 0, 0, 0))
-                        
-                        
-                        color = m.Disp.colors['Game']['selected_cell']
-                        color = (color[0],color[1],color[2],round(190+63*math.sin(self.pulse)))
-                        
-                        pygame.draw.polygon(polygon_surface,color,m.PI.Game.cells[x][y]['points'])
-                        m.Disp.screen.blit(polygon_surface, (0, 0))
-                        
             
             #pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['chessboard'],back,3)
         
