@@ -6,22 +6,26 @@ class Game:
     def __init__(self,m):
 
         self.cells = [
-            [{"value":"white_rook","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_rook","pos":[]}],
-            [{"value":"white_knight","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_knight","pos":[]}],
-            [{"value":"white_bishop","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_bishop","pos":[]}],
-            [{"value":"white_queen","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_queen","pos":[]}],
-            [{"value":"white_king","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_king","pos":[]}],
-            [{"value":"white_bishop","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_bishop","pos":[]}],
-            [{"value":"white_knight","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_knight","pos":[]}],
-            [{"value":"white_rook","pos":[]},{"value":"white_pawn","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"empty","pos":[]},{"value":"black_pawn","pos":[]},{"value":"black_rook","pos":[]}]
+            [{"value":"white_rook" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_rook" }],
+            [{"value":"white_knight" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_knight" }],
+            [{"value":"white_bishop" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_bishop" }],
+            [{"value":"white_queen" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_queen" }],
+            [{"value":"white_king" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_king" }],
+            [{"value":"white_bishop" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_bishop" }],
+            [{"value":"white_knight" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_knight" }],
+            [{"value":"white_rook" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_rook" }]
         ]
         
         for line in self.cells:
             for cell in line:
+                
+                cell['pos'] = []
+                cell['offset'] = []
                 cell['points'] = []
                 cell['status'] = "none"
         
         self.selected_cell = None
+        self.move = "white"
     
     def main(self,m):
 
@@ -33,7 +37,7 @@ class Game:
 
                 self.cells[x][y]['status'] = None
                 
-                if self.cells[x][y]['value'] != "empty":
+                if self.cells[x][y]['value'] != "empty" and self.cells[x][y]['value'][:5] == self.move:
                     
                     if m.PI.MI.mouse_click['lt']:
                         
@@ -42,7 +46,15 @@ class Game:
                             self.selected_cell = [x,y]
                             
         if self.selected_cell:
-            self.cells[self.selected_cell[0]][self.selected_cell[1]]['status'] = 'selected'
+            
+            cell = self.cells[self.selected_cell[0]][self.selected_cell[1]]
+            x = self.selected_cell[0]
+            y = self.selected_cell[1]
+            
+            cell['status'] = 'selected'
+            
+            if cell['value'][6:] == "pawn":
+                self.cells[x][y+1] = 'move'
 
     def createpos(self,m):
 
