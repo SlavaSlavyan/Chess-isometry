@@ -6,5 +6,3 @@ Chess = Main({"vers":"1.0.1"})
 
 while True:
     Chess.main()
-    
-    хуs
