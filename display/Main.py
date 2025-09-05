@@ -11,3 +11,7 @@ class Main:
     def main(self,m):
         
         self.width, self.height = self.Screen.get_size()
+
+        self.fps = m.Clock.get_fps()
+
+        m.Scenes.Chess.Disp.main(m)

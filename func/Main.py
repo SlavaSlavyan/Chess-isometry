@@ -4,9 +4,10 @@ import pygame
 import sys
 
 from func.inp.Main import Main as inp_Main
-from display._Main import Main as disp_Main
+from display.Main import Main as disp_Main
 from func.manager.LogManager import Log
 from func.manager.JsonManager import Json
+from scenes.Main import Main as Scenes
 
 class Main:
     
@@ -14,7 +15,7 @@ class Main:
     def __init__(self, args=None):
         
         # Логирование
-        self.Log = Log(self)
+        self.Log = Log()
         self.Log.write(["=====[START]=====\n","Инициализация основного модуля..."],"DEBUG")
         
         # Конфигурация программы
@@ -24,6 +25,7 @@ class Main:
         self.Log.write("Инициализация PyGame.","DEBUG")
         pygame.init()
         
+        self.Scenes = Scenes(self) # Все сцены
         self.Disp = disp_Main(self) # Display - отображение.
         self.PI = inp_Main(self) # Player input - ввод от пользователя.
         
@@ -43,7 +45,7 @@ class Main:
     
     # Перезагрузка конфигурации программы
     def reload_config(self):
-        self.config = self.load(self,"data\\config",True)
+        self.config = self.Json.load(self,"data\\config",True)
         
     # Остановка программы
     def stop(self):
