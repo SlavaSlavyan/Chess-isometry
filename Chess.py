@@ -1,8 +1,8 @@
-# Файл запуска.
+# Файл запуска программы.
 
 from func.Main import Main
 
-Chess = Main({"vers":"1.0.0"})
+Chess = Main({"vers":"1.0.1"})
 
 while True:
     Chess.main()

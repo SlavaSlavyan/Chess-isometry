@@ -1,0 +1,5 @@
+{
+    "max-fps":60,
+    "start-screen-size":[1200,800],
+    "save-logs":false
+}
