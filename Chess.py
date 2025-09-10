@@ -2,7 +2,7 @@
 
 from func.Main import Main
 
-Chess = Main({"vers":"1.0.3"})
+Chess = Main({"vers":"1.0.4"})
 
 while True:
     Chess.main()
