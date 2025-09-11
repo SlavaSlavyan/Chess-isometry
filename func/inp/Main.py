@@ -5,7 +5,7 @@ import pygame
 class Main:
     
     def __init__(self,m):
-        pass
+        m.Log.write("Инициализация класса эвентов.","DEBUG")
     
     def main(self,m):
         

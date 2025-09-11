@@ -4,6 +4,9 @@ import math
 class Display:
 
     def __init__(self,m):
+        
+        m.Log.write("       |Инициализация отображения сцены Chess.")
+        
         self.rotate = [0,0]
 
     def main(self, m):

@@ -14,9 +14,13 @@ class Main:
     # В аргументах указываются особые аргументы по типу версии игры
     def __init__(self, args=None):
         
+        self.main_args = args
+        
         # Логирование
         self.Log = Log()
-        self.Log.write(["=====[START]=====\n","Инициализация основного модуля..."],"DEBUG")
+        self.Log.write([
+        "=====[START]=====\n",f"{self.main_args['name']} {self.main_args['type']} {self.main_args['vers']} by {self.main_args['authors']}",
+        "Инициализация основного модуля..."],"DEBUG")
         
         # Конфигурация программы
         self.Json = Json(self)
@@ -31,6 +35,8 @@ class Main:
         
         self.Log.write("Создание модуля контролирования потока кадров","DEBUG")
         self.Clock = pygame.time.Clock()
+        
+        self.Log.write("Конец инициализации основного модуля.","DEBUG")
     
     # Основная функция для цикла
     def main(self):
@@ -51,6 +57,9 @@ class Main:
     def stop(self):
         
         self.Log.write("Запущена функция отключения программы...","WARNING")
+        
+        self.Log.write("@SLL: bb all!")
+        self.Log.write("=====[END]=====","DEBUG")
         
         if self.config["save-logs"]:
             self.Log.save()

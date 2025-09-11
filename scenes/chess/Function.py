@@ -1,7 +1,7 @@
 class Function:
 
     def __init__(self,m):
-        pass
+        m.Log.write("       |Инициализация логики сцены Chess.")
 
     def main(self,m):
 

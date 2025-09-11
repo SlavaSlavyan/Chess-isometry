@@ -6,6 +6,9 @@ class Main:
     
     def __init__(self,m):
         
+        m.Log.write("Инициализация класса отображения.","DEBUG")
+        
+        m.Log.write("Создание класса окна.","DEBUG")
         self.Screen = pygame.display.set_mode(m.config['start-screen-size'],pygame.RESIZABLE)
     
     def main(self,m):

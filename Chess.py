@@ -14,10 +14,15 @@ try:
 
     from func.Main import Main
 
-    Chess = Main({"vers":"1.0.5"})
+    Chess = Main({"vers":"1.0.6",
+                  "type":"ALPHA",
+                  "name":"ISOMETRIC CHESS",
+                  "authors":"SLL"})
 
     if loading_screen:
         loading.terminate()
+        
+    Chess.Log.write("Запуск основного цикла...\n","DEBUG")
 
     while True:
         

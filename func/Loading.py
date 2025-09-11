@@ -32,14 +32,14 @@ while True:
         title = "Loading..."
     elif math.sin(timer) > 1/3:
         title = "Loading.  "
-    else:
+    else:                                                                                                        
         title = "Loading.. "
         
     turtle.teleport(0,0)
     
     turtle.write(title,False,'center',("Courier",30,"normal"))
     
-    turtle.teleport(-turtle.Screen().window_width()//2+10,-turtle.Screen().window_height()//2)
+    turtle.teleport(-turtle.Screen().window_width()//2+10,-turtle.Screen().window_height()//2+10)
     
     turtle.write(data,True,'left',("Courier",8,"normal"))
     
