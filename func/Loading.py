@@ -1,9 +1,6 @@
 import turtle
 import math
 from pathlib import Path
-
-if not Path('data\\logs').exists():
-    Path('data\\logs').mkdir(parents=True, exist_ok=True)
     
 if Path('data\\logs\\_last.log').exists():
     Path('data\\logs\\_last.log').unlink()
