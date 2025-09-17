@@ -2,10 +2,14 @@
 
 import pygame
 
+from func.inp.KeyInput import KeyInput
+
 class Main:
     
     def __init__(self,m):
         m.Log.write("Инициализация класса эвентов.","DEBUG")
+
+        self.KI = KeyInput(m)
     
     def main(self,m):
         
@@ -13,3 +17,5 @@ class Main:
             
             if event.type == pygame.QUIT:
                 m.stop()
+            
+            self.KI.main(m,event)

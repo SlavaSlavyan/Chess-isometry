@@ -56,7 +56,9 @@ class Main:
     # Остановка программы
     def stop(self):
         
-        self.Log.write("Запущена функция отключения программы...","WARNING")
+        self.Log.write("Запущена функция отключения программы...\n","WARNING")
+
+        self.Json.save(self,"data\\config",self.config)
         
         self.Log.write("@SLL: bb all!")
         self.Log.write("=====[END]=====","DEBUG")

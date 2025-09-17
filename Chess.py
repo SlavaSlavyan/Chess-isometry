@@ -14,7 +14,7 @@ try:
 
     from func.Main import Main
 
-    Chess = Main({"vers":"1.0.7",
+    Chess = Main({"vers":"1.0.8",
                   "type":"DEV",
                   "name":"ISOMETRIC CHESS",
                   "authors":"SLL"})
