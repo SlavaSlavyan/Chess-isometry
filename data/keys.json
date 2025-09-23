@@ -2,5 +2,9 @@
     "up":1073741906,
     "left":1073741904,
     "down":1073741905,
-    "right":1073741903
+    "right":1073741903,
+    "select_up":119,
+    "select_left":97,
+    "select_down":115,
+    "select_right":100
 }

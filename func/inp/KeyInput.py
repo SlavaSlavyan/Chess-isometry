@@ -13,11 +13,11 @@ class KeyInput:
             self.keys[name] = {"id":id,"press":False,"hold":False,"release":False}
 
     def main(self,m,event):
-        
-        for name,value in self.keys.items():
 
-            if event.type == pygame.KEYDOWN:
-                
+        if event.type == pygame.KEYDOWN:
+            
+            for name,value in self.keys.items():
+            
                 if event.key == value['id']:
                     
                     self.keys[name]['press'] = True
@@ -25,10 +25,12 @@ class KeyInput:
 
                     m.Log.write(f"[1] Клавиша {name} id:{value['id']} была зажата.")
 
-                #m.Log.write(f"Key: {event.key}.")
-                
-            if event.type == pygame.KEYUP:
-                
+            m.Log.write(f"Key: {event.key}.","DEBUG")
+            
+        if event.type == pygame.KEYUP:
+            
+            for name,value in self.keys.items():
+            
                 if event.key == value['id']:
                     
                     self.keys[name]['release'] = True
