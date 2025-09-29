@@ -9,6 +9,8 @@ from display.main import Display
 from function.PlayerInput import PlayerInput
 from function.Menu import Menu
 from function.Settings import Settings
+from function.Multiplayer import Multiplayer
+from function.PlayerProfile import PlayerProfile
 
 class Main:
 
@@ -25,6 +27,8 @@ class Main:
         self.PI = PlayerInput(self)
         self.Menu = Menu(self)
         self.Settings = Settings(self)
+        self.Multiplayer = Multiplayer(self)
+        self.PlayerProfile = PlayerProfile()
 
         self.scene = 'menu'
         self.prev_scene = None
@@ -72,6 +76,42 @@ class Main:
                 
                 self.Settings.main(self)
                 self.Disp.main(self, scene='settings')
+                
+                self.PI.MI.update(self)
+                self.PI.KI.update(self)
+            elif self.scene == 'multiplayer':
+                # Обработка событий в мультиплеере
+                self.PI.MI.mouse_pos = pygame.mouse.get_pos()
+                
+                events = []
+                for event in pygame.event.get():
+                    events.append(event)
+                    if event.type == pygame.QUIT:
+                        self.stop()
+                    self.PI.MI.main(self, event)
+                    self.PI.KI.main(self, event)
+                    
+                    # Обрабатываем ввод для чата
+                    if hasattr(self, 'ChatSystem'):
+                        self.ChatSystem.handle_key_input(event)
+                
+                self.Disp.fullscreen_press_check(self)
+                self.Disp.debug_mode_press_check(self)
+                
+                # Обрабатываем горячие клавиши для чата
+                if hasattr(self, 'ChatSystem'):
+                    keys = pygame.key.get_pressed()
+                    if keys[pygame.K_RETURN] and not self.ChatSystem.input_active:
+                        self.ChatSystem.start_input()
+                    elif keys[pygame.K_t] and not self.ChatSystem.input_active:
+                        self.ChatSystem.toggle_visibility()
+                
+                self.Multiplayer.main(self)
+                # Передаем события в мультиплеер для обработки текстового ввода
+                self.Multiplayer.handle_text_input(self, events)
+                # Обрабатываем редактор аватаров
+                self.Multiplayer.handle_avatar_editor(self, events, self.PI.MI.mouse_pos)
+                self.Disp.main(self, scene='multiplayer')
                 
                 self.PI.MI.update(self)
                 self.PI.KI.update(self)

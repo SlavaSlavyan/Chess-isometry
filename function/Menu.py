@@ -32,7 +32,7 @@ class Menu:
 		# Проверяем, есть ли активная игра (игра считается активной, если был сделан хотя бы один ход)
 		has_active_game = hasattr(m.PI.Game, 'game_started') and getattr(m.PI.Game, 'game_started', False)
 		
-		button_count = 4 if has_active_game else 3
+		button_count = 5 if has_active_game else 4
 		start_y = height//2 - int(btn_h * button_count / 2) - 10
 		
 		self.buttons = {}
@@ -43,6 +43,8 @@ class Menu:
 			y_offset += btn_h + 12
 		
 		self.buttons["play"] = pygame.Rect(cx, start_y + y_offset, btn_w, btn_h)
+		y_offset += btn_h + 12
+		self.buttons["multiplayer"] = pygame.Rect(cx, start_y + y_offset, btn_w, btn_h)
 		y_offset += btn_h + 12
 		self.buttons["settings"] = pygame.Rect(cx, start_y + y_offset, btn_w, btn_h)
 		y_offset += btn_h + 12
@@ -74,6 +76,9 @@ class Menu:
 				# Новая игра с анимацией входа
 				m.PI.Game.restart_game(m)
 				m.set_scene('game')
+			elif self.hover == "multiplayer":
+				# Переходим в мультиплеер
+				m.set_scene('multiplayer')
 			elif self.hover == "settings":
 				# Переходим в настройки
 				m.set_scene('settings')

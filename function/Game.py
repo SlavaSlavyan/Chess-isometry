@@ -180,7 +180,13 @@ class Game:
         self.current_player = "white"  # Белые ходят первыми
         self.game_over = False
         self.winner = None
-        self.game_started = False  # Флаг начала игры
+        self.game_started = False
+        
+        # Мультиплеер
+        self.multiplayer_mode = False
+        self.is_host = False
+        self.my_team = "white"  # Какой команде принадлежит локальный игрок
+        self.waiting_for_opponent = False  # Флаг начала игры
 
         # Анимации
         self.anim_move = None  # {'from':(x,y),'to':(x,y),'piece':str,'start':ms,'dur':ms,'is_attack':bool}
@@ -279,6 +285,94 @@ class Game:
         
         print("🔄 Игра перезапущена!")
     
+    def setup_multiplayer(self, m, is_host: bool):
+        """Настраивает игру для мультиплеера"""
+        self.multiplayer_mode = True
+        self.is_host = is_host
+        self.my_team = "white" if is_host else "black"
+        
+        # Настраиваем обработчик сетевых сообщений
+        if hasattr(m, 'NetworkManager'):
+            m.NetworkManager.on_message_received = lambda msg: self.handle_network_message(m, msg)
+        
+        print(f"🌐 Мультиплеер настроен: {'Хост' if is_host else 'Клиент'}, команда: {self.my_team}")
+    
+    def send_move(self, m, from_pos: tuple, to_pos: tuple):
+        """Отправляет ход по сети"""
+        if hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
+            move_data = {
+                'from': from_pos,
+                'to': to_pos,
+                'player': self.current_player,
+                'board_state': self.get_board_state()
+            }
+            m.NetworkManager.send_message('game_move', move_data)
+    
+    def handle_network_message(self, m, message):
+        """Обрабатывает сетевые сообщения"""
+        msg_type = message.get('type')
+        data = message.get('data', {})
+        
+        if msg_type == 'game_move':
+            self.receive_move(m, data)
+        elif msg_type == 'game_state_sync':
+            self.sync_game_state(m, data)
+    
+    def receive_move(self, m, move_data):
+        """Получает ход от противника"""
+        from_pos = tuple(move_data.get('from', (0, 0)))
+        to_pos = tuple(move_data.get('to', (0, 0)))
+        player = move_data.get('player', 'white')
+        
+        # Проверяем что ход от противника
+        if player == self.my_team:
+            return
+        
+        # Применяем ход
+        self.apply_remote_move(m, from_pos, to_pos)
+    
+    def apply_remote_move(self, m, from_pos: tuple, to_pos: tuple):
+        """Применяет ход противника"""
+        from_x, from_y = from_pos
+        to_x, to_y = to_pos
+        
+        # Проверяем валидность хода (базовая проверка)
+        if not (0 <= from_x < 8 and 0 <= from_y < 8 and 0 <= to_x < 8 and 0 <= to_y < 8):
+            return
+        
+        # Запускаем анимацию для хода противника
+        is_attack = self.cells[to_x][to_y]['value'] != "empty"
+        
+        # Применяем ход напрямую (без анимации для удаленного хода)
+        self.make_move(from_pos, to_pos, m)
+        self.switch_player()
+        
+        print(f"📩 Получен ход противника: {from_pos} -> {to_pos}")
+    
+    def get_board_state(self):
+        """Возвращает текущее состояние доски"""
+        board_state = []
+        for x in range(8):
+            row = []
+            for y in range(8):
+                row.append(self.cells[x][y]['value'])
+            board_state.append(row)
+        return board_state
+    
+    def sync_game_state(self, m, state_data):
+        """Синхронизирует состояние игры"""
+        board_state = state_data.get('board_state', [])
+        current_player = state_data.get('current_player', 'white')
+        
+        if len(board_state) == 8:
+            for x in range(8):
+                if len(board_state[x]) == 8:
+                    for y in range(8):
+                        self.cells[x][y]['value'] = board_state[x][y]
+            
+            self.current_player = current_player
+            print("🔄 Состояние игры синхронизировано")
+    
     def mouse_input(self,m):
         
         if self.game_over:
@@ -287,6 +381,11 @@ class Game:
         # Блокируем ввод на время анимации перемещения
         if self.anim_move is not None:
             return
+        
+        # В мультиплеере блокируем ввод если не наша очередь
+        if self.multiplayer_mode:
+            if self.current_player != self.my_team:
+                return
 
         if m.PI.MI.mouse_click['lt']:
             clicked_cell = None
@@ -402,6 +501,11 @@ class Game:
                     amp = max(4, int(2 * m.config['zoom']))
                 m.Disp.Game.start_shake(120, amp)
             self.selected_cell = None
+            
+            # Отправляем ход по сети в мультиплеере
+            if self.multiplayer_mode and hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
+                self.send_move(m, from_pos, to_pos)
+            
             self.switch_player()
             self.clear_all_statuses()
     

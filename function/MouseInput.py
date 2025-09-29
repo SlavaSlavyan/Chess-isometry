@@ -45,10 +45,16 @@ class MouseInput:
             m.AssetManager.check_new_zoom(m)
             
             if event.y > 0:
-                m.config['zoom'] = round(m.config['zoom'] + 0.1, 1)
+                m.config['zoom'] = round(m.config['zoom'] + 0.1, 2)
             
             if event.y < 0:
-                m.config['zoom'] = round(m.config['zoom'] - 0.1, 1)
+                m.config['zoom'] = round(m.config['zoom'] - 0.1, 2)
+
+            # Безопасные ограничения зума, чтобы исключить отрицательные и нулевые значения
+            if m.config['zoom'] < 0.1:
+                m.config['zoom'] = 0.1
+            elif m.config['zoom'] > 5.0:
+                m.config['zoom'] = 5.0
     
     def update(self,m):
 

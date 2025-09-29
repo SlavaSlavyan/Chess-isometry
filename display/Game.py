@@ -67,6 +67,10 @@ class Game:
             pygame.draw.line(m.Disp.screen,(0,255,0),(m.Disp.width//2,0),(m.Disp.width//2,m.Disp.height))
             pygame.draw.line(m.Disp.screen,(0,0,255),(0,m.Disp.height//2),(m.Disp.width,m.Disp.height//2))
         
+        # Отображаем чат в мультиплеере
+        if hasattr(m.PI.Game, 'multiplayer_mode') and m.PI.Game.multiplayer_mode and hasattr(m, 'ChatSystem'):
+            m.ChatSystem.draw(m.Disp.screen, 20, m.Disp.height - 260)
+        
         self.pulse += 0.05
     
     def draw_player_indicator(self, m):
@@ -273,7 +277,8 @@ class Game:
     
     def square(self,m,center:tuple,size:float) -> list:
         
-        z = m.config['zoom']
+        # Клэмпим зум, чтобы не было отрицательных/нулевых значений
+        z = max(0.1, float(m.config.get('zoom', 1.0)))
 
         points = []
 
@@ -337,7 +342,9 @@ class Game:
 
                 if cells[x][y]['value'] in images:
                     image = images[cells[x][y]['value']]
-                    image = pygame.transform.scale(image, (50*z, 50*z))
+                    iw = int(max(1, round(50*z)))
+                    ih = int(max(1, round(50*z)))
+                    image = pygame.transform.scale(image, (iw, ih))
                     if self.rotate[1] < -90 or self.rotate[1] > 90:
                         image = pygame.transform.flip(image, False, True)
                     image_size = image.get_size()

@@ -1,12 +1,12 @@
 {
-    "fullscreen": true,
+    "fullscreen": false,
     "start-size": [
         1200,
         800
     ],
     "them": "base",
-    "zoom": 1.1,
-    "f3": true,
+    "zoom": 0.8,
+    "f3": false,
     "music_volume": 0.345,
     "sfx_volume": 0.83
 }

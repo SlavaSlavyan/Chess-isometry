@@ -290,6 +290,7 @@ class Menu:
 			label = name.upper()
 			if name == 'continue': label = 'CONTINUE'
 			elif name == 'play': label = 'NEW GAME'
+			elif name == 'multiplayer': label = 'MULTIPLAYER'
 			elif name == 'settings': label = 'SETTINGS'
 			elif name == 'exit': label = 'EXIT'
 			render = self.text_font.render(label, True, (255,255,255))

@@ -6,6 +6,7 @@ import os
 from display.Game import Game
 from display.Menu import Menu as MenuDisplay
 from display.Settings import Settings as SettingsDisplay
+from display.Multiplayer import Multiplayer as MultiplayerDisplay
 
 class Display:
 
@@ -59,6 +60,12 @@ class Display:
                 self.Settings = SettingsDisplay(m)
             self.Settings.intro_t = (pygame.time.get_ticks() - self.scene_started_at) / 1000.0
             self.Settings.main(m)
+        elif scene == 'multiplayer':
+            # Отрисовка мультиплеера
+            if not hasattr(self, 'Multiplayer'):
+                self.Multiplayer = MultiplayerDisplay(m)
+            self.Multiplayer.intro_t = (pygame.time.get_ticks() - self.scene_started_at) / 1000.0
+            self.Multiplayer.main(m)
         else:
             self.Game.main(m)
         
