@@ -2,6 +2,8 @@ import pygame
 import math
 
 from display.Game import Game
+from display.Menu import Menu as MenuDisplay
+from display.Settings import Settings as SettingsDisplay
 
 class Display:
 
@@ -17,13 +19,41 @@ class Display:
 
         self.clock = pygame.time.Clock()
         self.fps = self.clock.get_fps()
+        self.last_scene = None
+        self.scene_started_at = 0
 
-    def main(self,m):
+    def main(self,m, scene='game'):
         
         self.fps = self.clock.get_fps()
         self.width, self.height = self.screen.get_size()
+        # Детект смены сцены
+        if self.last_scene != scene:
+            self.last_scene = scene
+            self.scene_started_at = pygame.time.get_ticks()
+            # Подготовка меню для intro-анимации
+            if scene == 'menu' and hasattr(self, 'Menu'):
+                setattr(self.Menu, 'intro_t', 0)
+                # Обновляем splash-текст при входе в меню
+                m.SplashManager.refresh_splash()
+            if scene == 'game':
+                # Можно сбросить мелкие эффектные параметры игры, если нужны
+                pass
         
-        self.Game.main(m)
+        if scene == 'menu':
+            # Отрисовка меню. Меню само рисует фон и элементы UI.
+            if not hasattr(self, 'Menu'):
+                self.Menu = MenuDisplay(m)
+            # Передаем время с начала сцены в меню
+            self.Menu.intro_t = (pygame.time.get_ticks() - self.scene_started_at) / 1000.0
+            self.Menu.main(m)
+        elif scene == 'settings':
+            # Отрисовка настроек
+            if not hasattr(self, 'Settings'):
+                self.Settings = SettingsDisplay(m)
+            self.Settings.intro_t = (pygame.time.get_ticks() - self.scene_started_at) / 1000.0
+            self.Settings.main(m)
+        else:
+            self.Game.main(m)
         
         if m.config['f3']:
             self.f3(m)
