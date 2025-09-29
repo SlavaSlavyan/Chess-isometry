@@ -28,6 +28,10 @@ class Main:
 
         self.scene = 'menu'
         self.prev_scene = None
+        
+        # Ограничение FPS
+        self.clock = pygame.time.Clock()
+        self.target_fps = 60
 
     def start(self):
 
@@ -79,7 +83,9 @@ class Main:
             self.AudioManager.update()
             
             pygame.display.flip()
-            self.Disp.clock.tick(60)
+            
+            # Ограничиваем FPS
+            self.clock.tick(self.target_fps)
     
     def stop(self):
         
@@ -87,7 +93,7 @@ class Main:
         self.config['music_volume'] = self.AudioManager.music_volume
         self.config['sfx_volume'] = self.AudioManager.sfx_volume
         
-        self.JsonManager.save("data\\config",self.config)
+        self.JsonManager.save("data/config",self.config)
         pygame.quit()
         sys.exit()
 

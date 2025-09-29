@@ -1,5 +1,7 @@
 import pygame
 import math
+import sys
+import os
 
 from display.Game import Game
 from display.Menu import Menu as MenuDisplay
@@ -8,23 +10,28 @@ from display.Settings import Settings as SettingsDisplay
 class Display:
 
     def __init__(self,m):
+        
+        def get_resource_path(relative_path):
+            """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+            if hasattr(sys, '_MEIPASS'):
+                return os.path.join(sys._MEIPASS, relative_path)
+            else:
+                return relative_path
 
-        self.f3font = pygame.font.Font('data\\font\\text.ttf', 9)
-        self.colors = m.JsonManager.load(f"data\\them\\{m.config['them']}")
+        self.f3font = pygame.font.Font(get_resource_path('data/font/text.ttf'), 9)
+        self.colors = m.JsonManager.load(f"data/them/{m.config['them']}")
 
         self.width,self.height = m.config['start-size']
         self.reload_screen_mode(m)
 
         self.Game = Game(m)
 
-        self.clock = pygame.time.Clock()
-        self.fps = self.clock.get_fps()
         self.last_scene = None
         self.scene_started_at = 0
 
     def main(self,m, scene='game'):
         
-        self.fps = self.clock.get_fps()
+        self.fps = m.clock.get_fps()
         self.width, self.height = self.screen.get_size()
         # Детект смены сцены
         if self.last_scene != scene:

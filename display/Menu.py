@@ -1,15 +1,34 @@
 import pygame
 import math
+import sys
+import os
 
 class Menu:
 
 	def __init__(self,m):
 
-		self.title_font = pygame.font.Font('data\\font\\title.ttf', 72)
-		self.text_font = pygame.font.Font('data\\font\\text.ttf', 22)
-		self.small_font = pygame.font.Font('data\\font\\text.ttf', 14)
+		self.title_font = pygame.font.Font(self.get_resource_path('data/font/title.ttf'), 72)
+		self.text_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 22)
+		self.small_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 14)
 		self.pulse = 0
 		self.intro_t = 0.0  # время с начала показа меню (сек)
+		
+		# Кеш для фоновой поверхности  
+		self.background_surface = None
+		self.background_cached = False
+		
+		# Кешированные шрифты
+		self.splash_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 16)
+		self.author_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 18)
+		self.about_title_font = pygame.font.Font(self.get_resource_path('data/font/title.ttf'), 32)
+		self.about_text_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 16)
+
+	def get_resource_path(self, relative_path):
+		"""Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+		if hasattr(sys, '_MEIPASS'):
+			return os.path.join(sys._MEIPASS, relative_path)
+		else:
+			return relative_path
 
 	def main(self,m):
 
@@ -28,17 +47,63 @@ class Menu:
 		colors = m.Disp.colors['Game']
 		screen.fill(colors['bg'])
 
-		# Рисуем большую изометрическую доску как фон
-		# Лёгкий параллакс/слайд снизу при входе
+		# Создаём фоновую поверхность с шахматной доской только один раз
+		if not self.background_cached:
+			self.background_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
+			
+			# Сохраняем оригинальные настройки поворота и зума
+			original_rotate = m.Disp.Game.rotate[:]
+			original_zoom = m.config['zoom']
+			
+			# Используем точно те же настройки что и в игре
+			m.Disp.Game.rotate = [0, -90]  # Изометрический поворот как в игре
+			m.config['zoom'] = original_zoom  # Тот же зум что и в игре
+			
+			# Создаем временные позиции клеток для фона
+			temp_cells = []
+			for y in range(8):
+				row = []
+				for x in range(8):
+					offset_x = x * 50*m.config['zoom'] - 175*m.config['zoom']
+					offset_y = y * 50*m.config['zoom'] - 175*m.config['zoom']
+
+					rotated_x = offset_x * math.cos(math.pi*m.Disp.Game.rotate[0]/180) - offset_y * math.sin(math.pi*m.Disp.Game.rotate[0]/180)
+					rotated_y = (offset_x * math.sin(math.pi*m.Disp.Game.rotate[0]/180) + offset_y * math.cos(math.pi*m.Disp.Game.rotate[0]/180))*math.sin(math.pi*m.Disp.Game.rotate[1]/180)
+
+					draw_x = int(m.Disp.width//2 + rotated_x)
+					draw_y = int(m.Disp.height//2 + rotated_y)
+					
+					points = m.Disp.Game.square(m, (draw_x, draw_y), 50/(math.pi/2.2))
+					row.append(points)
+				temp_cells.append(row)
+			
+			# Рисуем основу доски
+			board = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),400)
+			back = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),283)
+			
+			# Основной фон доски
+			pygame.draw.polygon(self.background_surface, colors['bg'], board)
+			pygame.draw.polygon(self.background_surface, colors['chessboard'], back)
+			
+			# Рисуем клетки шахматной доски напрямую на поверхность (оптимизированно)
+			for y in range(8):
+				for x in range(8):
+					if (x+y)%2 == 1:  # Светлые клетки
+						# Рисуем полупрозрачные светлые клетки
+						light_color = (*colors['light_cell'], 120)
+						pygame.draw.polygon(self.background_surface, light_color, temp_cells[y][x])
+			
+			# Восстанавливаем оригинальные настройки
+			m.Disp.Game.rotate = original_rotate
+			m.config['zoom'] = original_zoom
+			
+			self.background_cached = True
+
+		# Рисуем кешированную поверхность с анимацией
 		intro = min(1.0, self.intro_t)
 		offset_y = int((1.0 - intro) * m.Disp.height * 0.10)
-		center = (m.Disp.width//2, m.Disp.height//2 + offset_y)
-		for i in range(6, 0, -1):
-			alpha = int(24 + i*10)
-			poly = m.Disp.Game.square(m, center, 130 + i*50)
-			s = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
-			pygame.draw.polygon(s, (*colors['chessboard'], alpha), poly)
-			screen.blit(s, (0,0))
+		
+		screen.blit(self.background_surface, (0, offset_y))
 
 	def draw_title(self,m):
 
@@ -82,8 +147,7 @@ class Menu:
 		base_y = title_y + offset_y
 		
 		# Создаём поверхность для поворота текста
-		splash_font = pygame.font.Font('data\\font\\text.ttf', 16)
-		splash_render = splash_font.render(splash_text, True, (255, 255, 0))
+		splash_render = self.splash_font.render(splash_text, True, (255, 255, 0))
 		
 		# Масштабируем
 		scaled_width = int(splash_render.get_width() * anim['scale'])
@@ -124,8 +188,7 @@ class Menu:
 		else:
 			color = (140, 140, 140, intro_alpha)  # Серый цвет
 		
-		author_font = pygame.font.Font('data\\font\\text.ttf', 18)  # Увеличиваем шрифт
-		author_text = author_font.render("rework by Heck43 :3", True, color[:3])
+		author_text = self.author_font.render("rework by Heck43 :3", True, color[:3])
 		author_text.set_alpha(intro_alpha)
 		
 		# Позиция с анимацией въезда снизу
@@ -158,8 +221,7 @@ class Menu:
 		pygame.draw.rect(screen, colors['light_cell'], window_rect, 3, border_radius=10)
 		
 		# Заголовок
-		title_font = pygame.font.Font('data\\font\\title.ttf', 32)
-		title_text = title_font.render("О ПРОЕКТЕ", True, (255, 255, 255))
+		title_text = self.about_title_font.render("О ПРОЕКТЕ", True, (255, 255, 255))
 		title_rect = title_text.get_rect(centerx=window_x + window_w//2, y=window_y + 20)
 		screen.blit(title_text, title_rect)
 		
@@ -182,7 +244,6 @@ class Menu:
 			"Полная валидация шахматных правил"
 		]
 		
-		text_font = pygame.font.Font('data\\font\\text.ttf', 16)
 		y_offset = title_rect.bottom + 25
 		
 		for line in info_lines:
@@ -196,7 +257,7 @@ class Menu:
 				color = (220, 220, 220)  # Обычный белый
 			
 			if line.strip():  # Не рисуем пустые строки
-				line_text = text_font.render(line, True, color)
+				line_text = self.about_text_font.render(line, True, color)
 				line_rect = line_text.get_rect(centerx=window_x + window_w//2, y=y_offset)
 				screen.blit(line_text, line_rect)
 			

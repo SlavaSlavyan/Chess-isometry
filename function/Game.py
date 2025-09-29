@@ -446,7 +446,7 @@ class Game:
             for y in range(8):
                 original_statuses[(x, y)] = self.cells[x][y]['status']
                 self.cells[x][y]['status'] = None
-        
+                
         # Устанавливаем контекст игры для проверки ходов
         self.PM.game = self
         

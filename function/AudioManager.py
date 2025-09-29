@@ -1,6 +1,7 @@
 import pygame
 import os
 import random
+import sys
 
 class AudioManager:
     
@@ -23,9 +24,18 @@ class AudioManager:
         self.load_music()
         self.load_sfx()
         
+    def get_resource_path(self, relative_path):
+        """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+        if hasattr(sys, '_MEIPASS'):
+            # Запущено из PyInstaller
+            return os.path.join(sys._MEIPASS, relative_path)
+        else:
+            # Запущено в обычном режиме
+            return relative_path
+        
     def load_music(self):
         """Загружает все музыкальные файлы из папки data/audio/"""
-        audio_dir = "data/audio/"
+        audio_dir = self.get_resource_path("data/audio/")
         if not os.path.exists(audio_dir):
             return
             
@@ -123,7 +133,7 @@ class AudioManager:
     
     def load_sfx(self):
         """Загружает звуковые эффекты из папки data/sfx/"""
-        sfx_dir = "data/sfx/"
+        sfx_dir = self.get_resource_path("data/sfx/")
         if not os.path.exists(sfx_dir):
             print("Папка звуковых эффектов не найдена")
             return

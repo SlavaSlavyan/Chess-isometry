@@ -1,14 +1,28 @@
 import pygame
 import math
+import sys
+import os
 
 class Settings:
     
     def __init__(self, m):
-        self.title_font = pygame.font.Font('data\\font\\title.ttf', 48)
-        self.text_font = pygame.font.Font('data\\font\\text.ttf', 24)
-        self.small_font = pygame.font.Font('data\\font\\text.ttf', 18)
+        
+        self.title_font = pygame.font.Font(self.get_resource_path('data/font/title.ttf'), 48)
+        self.text_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 24)
+        self.small_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 18)
         self.pulse = 0
         self.intro_t = 0.0
+        
+        # Кеш для фоновой поверхности  
+        self.background_surface = None
+        self.background_cached = False
+    
+    def get_resource_path(self, relative_path):
+        """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+        if hasattr(sys, '_MEIPASS'):
+            return os.path.join(sys._MEIPASS, relative_path)
+        else:
+            return relative_path
     
     def main(self, m):
         self.draw_background(m)
@@ -21,18 +35,64 @@ class Settings:
         screen = m.Disp.screen
         colors = m.Disp.colors['Game']
         screen.fill(colors['bg'])
-        
-        # Изометрический фон как в меню
+
+        # Создаём фоновую поверхность с шахматной доской только один раз
+        if not self.background_cached:
+            self.background_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
+            
+            # Сохраняем оригинальные настройки поворота и зума
+            original_rotate = m.Disp.Game.rotate[:]
+            original_zoom = m.config['zoom']
+            
+            # Используем точно те же настройки что и в игре
+            m.Disp.Game.rotate = [0, -90]  # Изометрический поворот как в игре
+            m.config['zoom'] = original_zoom  # Тот же зум что и в игре
+            
+            # Создаем временные позиции клеток для фона
+            temp_cells = []
+            for y in range(8):
+                row = []
+                for x in range(8):
+                    offset_x = x * 50*m.config['zoom'] - 175*m.config['zoom']
+                    offset_y = y * 50*m.config['zoom'] - 175*m.config['zoom']
+
+                    rotated_x = offset_x * math.cos(math.pi*m.Disp.Game.rotate[0]/180) - offset_y * math.sin(math.pi*m.Disp.Game.rotate[0]/180)
+                    rotated_y = (offset_x * math.sin(math.pi*m.Disp.Game.rotate[0]/180) + offset_y * math.cos(math.pi*m.Disp.Game.rotate[0]/180))*math.sin(math.pi*m.Disp.Game.rotate[1]/180)
+
+                    draw_x = int(m.Disp.width//2 + rotated_x)
+                    draw_y = int(m.Disp.height//2 + rotated_y)
+                    
+                    points = m.Disp.Game.square(m, (draw_x, draw_y), 50/(math.pi/2.2))
+                    row.append(points)
+                temp_cells.append(row)
+            
+            # Рисуем основу доски (такая же как в игре)
+            board = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),400)
+            back = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),283)
+            
+            # Основной фон доски
+            pygame.draw.polygon(self.background_surface, colors['bg'], board)
+            pygame.draw.polygon(self.background_surface, colors['chessboard'], back)
+            
+            # Рисуем клетки шахматной доски напрямую на поверхность (оптимизированно)
+            for y in range(8):
+                for x in range(8):
+                    if (x+y)%2 == 1:  # Светлые клетки
+                        # Рисуем полупрозрачные светлые клетки
+                        light_color = (*colors['light_cell'], 120)  # Такая же прозрачность как в меню
+                        pygame.draw.polygon(self.background_surface, light_color, temp_cells[y][x])
+            
+            # Восстанавливаем оригинальные настройки
+            m.Disp.Game.rotate = original_rotate
+            m.config['zoom'] = original_zoom
+            
+            self.background_cached = True
+
+        # Рисуем кешированную поверхность с анимацией
         intro = min(1.0, self.intro_t)
         offset_y = int((1.0 - intro) * m.Disp.height * 0.10)
-        center = (m.Disp.width//2, m.Disp.height//2 + offset_y)
         
-        for i in range(4, 0, -1):
-            alpha = int(20 + i*8)
-            poly = m.Disp.Game.square(m, center, 100 + i*40)
-            s = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
-            pygame.draw.polygon(s, (*colors['chessboard'], alpha), poly)
-            screen.blit(s, (0,0))
+        screen.blit(self.background_surface, (0, offset_y))
     
     def draw_title(self, m):
         text = "SETTINGS"

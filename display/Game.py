@@ -1,5 +1,7 @@
 import pygame
 import math
+import sys
+import os
 
 class Game:
 
@@ -12,10 +14,17 @@ class Game:
         self.shake_amp = 0
         self.shake_seed = 0
         
+        def get_resource_path(relative_path):
+            """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+            if hasattr(sys, '_MEIPASS'):
+                return os.path.join(sys._MEIPASS, relative_path)
+            else:
+                return relative_path
+        
         # Загружаем шрифты
-        self.font_text = pygame.font.Font('data\\font\\text.ttf', 24)
-        self.font_title = pygame.font.Font('data\\font\\title.ttf', 48)
-        self.font_small = pygame.font.Font('data\\font\\text.ttf', 18)
+        self.font_text = pygame.font.Font(get_resource_path('data/font/text.ttf'), 24)
+        self.font_title = pygame.font.Font(get_resource_path('data/font/title.ttf'), 48)
+        self.font_small = pygame.font.Font(get_resource_path('data/font/text.ttf'), 18)
         
         # Система частиц для эффекта распада
         self.particles = []

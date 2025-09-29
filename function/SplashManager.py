@@ -16,7 +16,7 @@ class SplashManager:
     def load_splashes(self, m):
         """Загружает список splash-текстов"""
         try:
-            splash_data = m.JsonManager.load("data\\splashes")
+            splash_data = m.JsonManager.load("data/splashes")
             self.splashes = splash_data.get("splashes", [])
             print(f"Загружено {len(self.splashes)} splash-текстов")
         except:

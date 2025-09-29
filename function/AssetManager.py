@@ -1,5 +1,7 @@
 import pygame
 from pathlib import Path
+import sys
+import os
 
 class AssetManager:
     
@@ -8,12 +10,25 @@ class AssetManager:
         self.loadimg(m)
         self.old_zoom = m.config['zoom']
     
+    def get_resource_path(self, relative_path):
+        """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
+        if hasattr(sys, '_MEIPASS'):
+            # Запущено из PyInstaller
+            return os.path.join(sys._MEIPASS, relative_path)
+        else:
+            # Запущено в обычном режиме
+            return relative_path
+    
     def loadimg(self,m):
 
         self.img = {}
 
-        for png_file in Path('data\\assets').glob('*.png'):
-            self.img[png_file.stem] = str(png_file)
+        assets_path = self.get_resource_path('data/assets')
+        assets_dir = Path(assets_path)
+        
+        if assets_dir.exists():
+            for png_file in assets_dir.glob('*.png'):
+                self.img[png_file.stem] = str(png_file)
 
         for key,value in self.img.items():
             self.img[key] = pygame.image.load(value)
