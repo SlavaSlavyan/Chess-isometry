@@ -236,7 +236,10 @@ class Game:
             m.set_scene('menu')
             return
         
-        # Обычные клавиши управления камерой
+        # Обычные клавиши управления камерой (не работают если чат активен)
+        if hasattr(m, 'ChatSystem') and m.ChatSystem.input_active:
+            return  # Блокируем управление камерой при вводе в чат
+        
         if m.PI.KI.keys['up']['value'] or m.PI.KI.keys['w']['value']:
             m.Disp.Game.rotate[1] += 1
         if m.PI.KI.keys['down']['value'] or m.PI.KI.keys['s']['value']:

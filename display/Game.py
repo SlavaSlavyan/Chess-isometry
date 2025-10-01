@@ -277,8 +277,7 @@ class Game:
     
     def square(self,m,center:tuple,size:float) -> list:
         
-        # Клэмпим зум, чтобы не было отрицательных/нулевых значений
-        z = max(0.1, float(m.config.get('zoom', 1.0)))
+        z = m.config['zoom']
 
         points = []
 
@@ -342,9 +341,7 @@ class Game:
 
                 if cells[x][y]['value'] in images:
                     image = images[cells[x][y]['value']]
-                    iw = int(max(1, round(50*z)))
-                    ih = int(max(1, round(50*z)))
-                    image = pygame.transform.scale(image, (iw, ih))
+                    image = pygame.transform.scale(image, (int(50*z), int(50*z)))
                     if self.rotate[1] < -90 or self.rotate[1] > 90:
                         image = pygame.transform.flip(image, False, True)
                     image_size = image.get_size()
@@ -371,5 +368,5 @@ class Game:
     def update_shake(self, m):
         if self.shake_time_ms <= 0:
             return
-        dt = m.Disp.clock.get_time()
+        dt = m.clock.get_time()
         self.shake_time_ms = max(0, self.shake_time_ms - dt)

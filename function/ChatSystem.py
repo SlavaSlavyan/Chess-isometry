@@ -48,11 +48,11 @@ class ChatSystem:
         
         # Цвета
         self.colors = {
-            'background': (0, 0, 0, 180),
-            'border': (100, 100, 100),
-            'input_bg': (40, 40, 40),
-            'input_border': (120, 120, 120),
-            'input_active': (60, 60, 60),
+            'background': (0, 0, 0, 100),  # Более прозрачный фон
+            'border': (100, 100, 100, 150),  # Полупрозрачная рамка
+            'input_bg': (20, 20, 20, 120),  # Полупрозрачный фон ввода
+            'input_border': (120, 120, 120, 180),
+            'input_active': (40, 40, 40, 150),  # Полупрозрачный активный фон
             'text_normal': (255, 255, 255),
             'text_system': (100, 255, 100),
             'text_error': (255, 100, 100),
@@ -207,12 +207,13 @@ class ChatSystem:
     def draw_messages(self, surface: pygame.Surface):
         """Рисует сообщения в чате"""
         visible_count = self.get_visible_messages_count()
-        start_index = max(0, len(self.messages) - visible_count - self.scroll_offset)
-        end_index = start_index + visible_count
+        # Всегда показываем последние сообщения (scroll_offset должен быть 0 для новых сообщений)
+        start_index = max(0, len(self.messages) - visible_count)
+        end_index = len(self.messages)
         
         y_offset = 5
         
-        for i in range(start_index, min(end_index, len(self.messages))):
+        for i in range(start_index, end_index):
             message = self.messages[i]
             
             # Определяем цвет текста
@@ -279,15 +280,18 @@ class ChatSystem:
         """Рисует поле ввода"""
         input_y = self.chat_height
         
+        # Создаем поверхность для фона ввода с альфа-каналом
+        input_rect = pygame.Rect(2, input_y + 2, self.chat_width - 4, self.input_height - 4)
+        input_surface = pygame.Surface((input_rect.width, input_rect.height), pygame.SRCALPHA)
+        
         # Фон поля ввода
         input_color = self.colors['input_active'] if self.input_active else self.colors['input_bg']
-        pygame.draw.rect(surface, input_color, 
-                        (2, input_y + 2, self.chat_width - 4, self.input_height - 4))
+        input_surface.fill(input_color)
+        surface.blit(input_surface, (input_rect.x, input_rect.y))
         
         # Рамка поля ввода
         border_color = self.colors['input_border']
-        pygame.draw.rect(surface, border_color, 
-                        (2, input_y + 2, self.chat_width - 4, self.input_height - 4), 1)
+        pygame.draw.rect(surface, border_color, input_rect, 1)
         
         # Текст в поле ввода
         display_text = self.input_text

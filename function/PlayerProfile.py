@@ -25,17 +25,11 @@ class PlayerProfile:
         self.default_avatar_size = 64
         self.avatar_surface = None
         
-        # Убеждаемся, что директория для аватаров существует
-        try:
-            os.makedirs(self.avatars_path, exist_ok=True)
-        except Exception:
-            pass
-
         # Загружаем профиль
         self.load_profile()
-
-        # Пытаемся загрузить сохранённый кастомный аватар, иначе генерируем дефолтный
-        if not self._load_avatar_from_disk():
+        
+        # Генерируем процедурный аватар только если нет сохраненного
+        if not self.avatar_surface:
             self.generate_default_avatar()
     
     def load_profile(self):
@@ -47,6 +41,20 @@ class PlayerProfile:
                     self.nickname = data.get('nickname', 'Player')
                     self.avatar_hash = data.get('avatar_hash', None)
                     self.stats = data.get('stats', self.stats)
+                    
+                    # Загружаем сохраненный аватар если есть
+                    if self.avatar_hash:
+                        avatar_file = os.path.join(self.avatars_path, f"{self.avatar_hash}.png")
+                        if os.path.exists(avatar_file):
+                            try:
+                                # Загружаем аватар из файла
+                                loaded_image = pygame.image.load(avatar_file)
+                                self.avatar_surface = loaded_image
+                                print(f"🎨 Аватар загружен из файла: {self.avatar_hash[:8]}...")
+                            except Exception as e:
+                                print(f"❌ Ошибка загрузки аватара: {e}")
+                                self.avatar_hash = None
+                    
                     print(f"✅ Профиль загружен: {self.nickname}")
             else:
                 print("📁 Создается новый профиль")
@@ -72,39 +80,6 @@ class PlayerProfile:
             print(f"💾 Профиль сохранен: {self.nickname}")
         except Exception as e:
             print(f"❌ Ошибка сохранения профиля: {e}")
-
-    def _avatar_file_path(self) -> str:
-        """Возвращает путь к файлу с аватаром по его хэшу."""
-        if not self.avatar_hash:
-            return None
-        return os.path.join(self.avatars_path, f"{self.avatar_hash}.png")
-
-    def _save_avatar_to_disk(self):
-        """Сохраняет текущий аватар на диск (data/avatars/<hash>.png)."""
-        try:
-            if not self.avatar_surface or not self.avatar_hash:
-                return False
-            os.makedirs(self.avatars_path, exist_ok=True)
-            path = self._avatar_file_path()
-            pygame.image.save(self.avatar_surface, path)
-            return True
-        except Exception as e:
-            print(f"❌ Ошибка сохранения файла аватара: {e}")
-            return False
-
-    def _load_avatar_from_disk(self) -> bool:
-        """Пытается загрузить сохранённый аватар с диска по avatar_hash."""
-        try:
-            path = self._avatar_file_path()
-            if path and os.path.exists(path):
-                image = pygame.image.load(path).convert_alpha()
-                # Подстраховка: приводим к нужному размеру
-                image = pygame.transform.smoothscale(image, (self.default_avatar_size, self.default_avatar_size))
-                self.avatar_surface = image
-                return True
-        except Exception as e:
-            print(f"❌ Ошибка загрузки файла аватара: {e}")
-        return False
     
     def set_nickname(self, nickname: str):
         """Устанавливает никнейм"""
@@ -169,9 +144,7 @@ class PlayerProfile:
     def get_avatar_surface(self) -> pygame.Surface:
         """Возвращает поверхность с аватаром"""
         if self.avatar_surface is None:
-            # Попробуем подхватить сохранённый файл, если есть хэш
-            if not self._load_avatar_from_disk():
-                self.generate_default_avatar()
+            self.generate_default_avatar()
         return self.avatar_surface
     
     def update_stats(self, result: str):
@@ -242,8 +215,13 @@ class PlayerProfile:
             
             # Создаем хэш для аватара
             self.avatar_hash = hashlib.md5(pygame.image.tostring(self.avatar_surface, 'RGBA')).hexdigest()
-            # Сохраняем файл аватара и профиль
-            self._save_avatar_to_disk()
+            
+            # Сохраняем аватар в файл
+            os.makedirs(self.avatars_path, exist_ok=True)
+            avatar_file = os.path.join(self.avatars_path, f"{self.avatar_hash}.png")
+            pygame.image.save(self.avatar_surface, avatar_file)
+            print(f"💾 Аватар сохранен в файл: {avatar_file}")
+            
             self.save_profile()
             
             print(f"🎨 Аватар загружен: {image_path}")
@@ -261,31 +239,11 @@ class PlayerProfile:
             # Декодируем base64
             avatar_bytes = base64.b64decode(avatar_data.encode('utf-8'))
             
-            # Создаем поверхность из данных
-            temp_surface = pygame.image.fromstring(avatar_bytes, (self.default_avatar_size, self.default_avatar_size), 'RGBA')
-            
-            # Создаем финальную поверхность с круглой маской
-            self.avatar_surface = pygame.Surface((self.default_avatar_size, self.default_avatar_size), pygame.SRCALPHA)
-            
-            # Создаем круглую маску
-            mask = pygame.Surface((self.default_avatar_size, self.default_avatar_size), pygame.SRCALPHA)
-            pygame.draw.circle(mask, (255, 255, 255), 
-                             (self.default_avatar_size//2, self.default_avatar_size//2), 
-                             self.default_avatar_size//2)
-            
-            # Применяем изображение и маску
-            self.avatar_surface.blit(temp_surface, (0, 0))
-            self.avatar_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_ALPHA_SDL2)
-            
-            # Добавляем обводку
-            pygame.draw.circle(self.avatar_surface, (50, 50, 50), 
-                             (self.default_avatar_size//2, self.default_avatar_size//2), 
-                             self.default_avatar_size//2, 3)
+            # Создаем поверхность из данных (аватар уже должен быть круглым с прозрачностью)
+            self.avatar_surface = pygame.image.fromstring(avatar_bytes, (self.default_avatar_size, self.default_avatar_size), 'RGBA')
             
             # Сохраняем хэш
             self.avatar_hash = avatar_hash
-            # Сохраняем файл аватара
-            self._save_avatar_to_disk()
             
             print(f"📩 Аватар получен от игрока: {avatar_hash[:8]}...")
             return True

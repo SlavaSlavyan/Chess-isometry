@@ -25,18 +25,16 @@ class PlayerInput:
             # Обрабатываем чат в мультиплеере
             if (hasattr(self.Game, 'multiplayer_mode') and self.Game.multiplayer_mode and 
                 hasattr(m, 'ChatSystem')):
+                # Если чат обработал событие, не передаем его дальше
                 if m.ChatSystem.handle_key_input(event):
-                    continue  # Если чат обработал событие, не передаем его дальше
+                    continue
+                # Обрабатываем открытие чата по T
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_t and not m.ChatSystem.input_active:
+                    m.ChatSystem.start_input()
+                    continue  # Не обрабатываем T дальше
             
             self.KI.main(m,event)
             self.MI.main(m,event)
-
-        # Обрабатываем горячие клавиши для чата
-        if (hasattr(self.Game, 'multiplayer_mode') and self.Game.multiplayer_mode and 
-            hasattr(m, 'ChatSystem')):
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_t] and not m.ChatSystem.input_active:
-                m.ChatSystem.start_input()
         
         self.logic(m) 
         

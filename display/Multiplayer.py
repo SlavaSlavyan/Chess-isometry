@@ -262,25 +262,29 @@ class Multiplayer:
         self.draw_buttons(m, m.Multiplayer.buttons, button_labels)
     
     def draw_waiting(self, m):
-        """Рисует экран ожидания для клиента"""
+        """Рисует экран ожидания для клиента (как лобби но без кнопки старта)"""
         colors = m.Disp.colors['Game']
         
         # Заголовок
-        title = self.subtitle_font.render("ОЖИДАНИЕ ХОСТА", True, (255, 255, 255))
-        title_rect = title.get_rect(center=(m.Disp.width//2, 150))
+        title = self.subtitle_font.render("ЛОББИ", True, (255, 255, 255))
+        title_rect = title.get_rect(center=(m.Disp.width//2, 80))
         m.Disp.screen.blit(title, title_rect)
         
-        # Анимированный индикатор загрузки
+        # Статус (ожидание хоста)
         dots = "." * (int(self.pulse * 3) % 4)
-        loading_text = self.text_font.render(f"Ожидание начала игры{dots}", True, (200, 200, 200))
-        loading_rect = loading_text.get_rect(center=(m.Disp.width//2, 200))
-        m.Disp.screen.blit(loading_text, loading_rect)
+        status = f"Ожидание начала игры{dots}"
+        status_text = self.text_font.render(status, True, (255, 200, 100))
+        status_rect = status_text.get_rect(center=(m.Disp.width//2, 120))
+        m.Disp.screen.blit(status_text, status_rect)
+        
+        # Список игроков (показываем хоста и себя)
+        self.draw_player_list(m, m.Disp.width//2 - 200, 160)
         
         # Чат
         if hasattr(m, 'ChatSystem'):
             m.ChatSystem.draw(m.Disp.screen, 50, m.Disp.height - 280)
         
-        # Кнопка отключения
+        # Кнопка отключения (без кнопки старта игры)
         self.draw_buttons(m, m.Multiplayer.buttons, {
             "disconnect": "ОТКЛЮЧИТЬСЯ"
         })

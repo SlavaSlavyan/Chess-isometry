@@ -1,0 +1,104 @@
+
+================================================================================
+[2025-09-30 18:19:50]
+Тип: AttributeError
+Сообщение: 'Multiplayer' object has no attribute 'draw_profile'
+Файл: Multiplayer.py
+Строка: 274
+Функция: draw_waiting
+Код: self.draw_profile(m, m.Disp.width//4, 150)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 123, in start
+    self.Disp.main(self, scene='multiplayer')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\main.py", line 68, in main
+    self.Multiplayer.main(m)
+    ~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 53, in main
+    self.draw_waiting(m)
+    ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 274, in draw_waiting
+    self.draw_profile(m, m.Disp.width//4, 150)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Multiplayer' object has no attribute 'draw_profile'
+================================================================================
+
+================================================================================
+[2025-09-30 18:19:50]
+Тип: AttributeError
+Сообщение: 'Multiplayer' object has no attribute 'draw_profile'
+Файл: Multiplayer.py
+Строка: 274
+Функция: draw_waiting
+Код: self.draw_profile(m, m.Disp.width//4, 150)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 123, in start
+    self.Disp.main(self, scene='multiplayer')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\main.py", line 68, in main
+    self.Multiplayer.main(m)
+    ~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 53, in main
+    self.draw_waiting(m)
+    ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 274, in draw_waiting
+    self.draw_profile(m, m.Disp.width//4, 150)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Multiplayer' object has no attribute 'draw_profile'
+================================================================================
+
+================================================================================
+[2025-09-30 18:19:51]
+Тип: AttributeError
+Сообщение: 'Multiplayer' object has no attribute 'draw_profile'
+Файл: Multiplayer.py
+Строка: 274
+Функция: draw_waiting
+Код: self.draw_profile(m, m.Disp.width//4, 150)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 123, in start
+    self.Disp.main(self, scene='multiplayer')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\main.py", line 68, in main
+    self.Multiplayer.main(m)
+    ~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 53, in main
+    self.draw_waiting(m)
+    ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 274, in draw_waiting
+    self.draw_profile(m, m.Disp.width//4, 150)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Multiplayer' object has no attribute 'draw_profile'
+================================================================================
+
+================================================================================
+[2025-09-30 18:19:51]
+Тип: AttributeError
+Сообщение: 'Multiplayer' object has no attribute 'draw_profile'
+Файл: Multiplayer.py
+Строка: 274
+Функция: draw_waiting
+Код: self.draw_profile(m, m.Disp.width//4, 150)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 123, in start
+    self.Disp.main(self, scene='multiplayer')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\main.py", line 68, in main
+    self.Multiplayer.main(m)
+    ~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 53, in main
+    self.draw_waiting(m)
+    ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\display\Multiplayer.py", line 274, in draw_waiting
+    self.draw_profile(m, m.Disp.width//4, 150)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Multiplayer' object has no attribute 'draw_profile'
+================================================================================

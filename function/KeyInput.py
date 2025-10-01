@@ -16,7 +16,8 @@ class KeyInput:
             "f3":{"id":pygame.K_F3,"value":False,"press":False,"release":False},
             "f11":{"id":pygame.K_F11,"value":False,"press":False,"release":False},
             "r":{"id":pygame.K_r,"value":False,"press":False,"release":False},
-            "esc":{"id":pygame.K_ESCAPE,"value":False,"press":False,"release":False}
+            "esc":{"id":pygame.K_ESCAPE,"value":False,"press":False,"release":False},
+            "t":{"id":pygame.K_t,"value":False,"press":False,"release":False}
         }
 
     def main(self,m,event):

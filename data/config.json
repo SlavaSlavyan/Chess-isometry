@@ -5,8 +5,8 @@
         800
     ],
     "them": "base",
-    "zoom": 0.8,
+    "zoom": 1.5,
     "f3": false,
-    "music_volume": 0.345,
+    "music_volume": 0.1,
     "sfx_volume": 0.83
 }

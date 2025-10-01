@@ -339,6 +339,10 @@ class Multiplayer:
         self.connected_player = address
         self.connection_status = f"Игрок подключился: {address[0]}"
         
+        # Отправляем клиенту свой профиль
+        if hasattr(m, 'PlayerProfile') and hasattr(m, 'NetworkManager'):
+            m.NetworkManager.send_message('player_profile', m.PlayerProfile.get_profile_data())
+        
         if hasattr(m, 'ChatSystem'):
             m.ChatSystem.add_system_message(f"Игрок подключился: {address[0]}")
     
@@ -386,7 +390,11 @@ class Multiplayer:
             if hasattr(m, 'ChatSystem'):
                 sender = data.get('sender', 'Unknown')
                 text = data.get('text', '')
-                m.ChatSystem.add_message(sender, text)
+                my_nickname = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
+                
+                # Добавляем только чужие сообщения (свои уже добавлены в send_message)
+                if sender != my_nickname:
+                    m.ChatSystem.add_message(sender, text)
         
         elif msg_type == 'game_start':
             # Запускаем игру
@@ -396,14 +404,12 @@ class Multiplayer:
         """Отправляет сообщение в чат"""
         if hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
             sender = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
+            
+            # Отправляем другому игроку (без локального добавления)
             m.NetworkManager.send_message('chat_message', {
                 'sender': sender,
                 'text': text
             })
-            
-            # Добавляем сообщение в локальный чат
-            if hasattr(m, 'ChatSystem'):
-                m.ChatSystem.add_message(sender, text)
     
     def start_multiplayer_game(self, m):
         """Запускает мультиплеер игру"""
@@ -416,8 +422,10 @@ class Multiplayer:
         m.PI.Game.restart_game(m)
         m.PI.Game.setup_multiplayer(m, self.is_host)
         
-        # Добавляем сообщение в чат
+        # Убеждаемся что callback чата установлен
         if hasattr(m, 'ChatSystem'):
+            m.ChatSystem.on_message_send = lambda text: self.send_chat_message(m, text)
+            m.ChatSystem.show()  # Показываем чат
             m.ChatSystem.add_system_message("🎮 Игра началась!")
             opponent_team = "черных" if self.is_host else "белых"
             my_team = "белыми" if self.is_host else "черными"
@@ -526,9 +534,6 @@ class Multiplayer:
                         m.PlayerProfile.avatar_surface = cropped_image
                         # Создаем хэш для аватара
                         m.PlayerProfile.avatar_hash = hashlib.md5(pygame.image.tostring(cropped_image, 'RGBA')).hexdigest()
-                        # Сохраняем файл аватара под НОВЫМ хэшем и обновляем профиль
-                        if hasattr(m.PlayerProfile, '_save_avatar_to_disk'):
-                            m.PlayerProfile._save_avatar_to_disk()
                         m.PlayerProfile.save_profile()
                         
                         self.connection_status = "Аватар сохранен!"
