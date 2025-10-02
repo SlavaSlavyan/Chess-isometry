@@ -13,16 +13,25 @@ class Menu:
 		self.pulse = 0
 		self.intro_t = 0.0  # время с начала показа меню (сек)
 		
-		# Кеш для фоновой поверхности  
-		self.background_surface = None
-		self.background_cached = False
-		self.cached_size = (0, 0)  # Запоминаем размер для которого создан фон
-		
 		# Кешированные шрифты
 		self.splash_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 16)
 		self.author_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 18)
 		self.about_title_font = pygame.font.Font(self.get_resource_path('data/font/title.ttf'), 32)
 		self.about_text_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 16)
+		
+		# Атмосферные частицы
+		import random
+		self.particles = []
+		for _ in range(40):
+			self.particles.append({
+				'x': random.uniform(0, 1280),
+				'y': random.uniform(0, 720),
+				'vx': random.uniform(-15, 15),
+				'vy': random.uniform(-30, -10),
+				'size': random.randint(1, 3),
+				'alpha': random.randint(50, 150),
+				'life': random.uniform(0.3, 1.0)
+			})
 
 	def get_resource_path(self, relative_path):
 		"""Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
@@ -34,6 +43,7 @@ class Menu:
 	def main(self,m):
 
 		self.draw_background(m)
+		self.update_and_draw_particles(m)
 		self.draw_title(m)
 		self.draw_splash(m)
 		self.draw_buttons(m)
@@ -43,82 +53,149 @@ class Menu:
 		self.pulse += 0.03
 
 	def draw_background(self,m):
-
+		"""Рисует фон с медленно вращающейся изометрической доской"""
 		screen = m.Disp.screen
 		colors = m.Disp.colors['Game']
-		screen.fill(colors['bg'])
 		
-		# Проверяем изменился ли размер экрана
-		current_size = (m.Disp.width, m.Disp.height)
-		if current_size != self.cached_size:
-			self.background_cached = False
-			self.cached_size = current_size
-
-		# Создаём фоновую поверхность с шахматной доской только один раз
-		if not self.background_cached:
-			self.background_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
-			
-			# Сохраняем оригинальные настройки поворота и зума
-			original_rotate = m.Disp.Game.rotate[:]
-			original_zoom = m.config['zoom']
-			
-			# Используем точно те же настройки что и в игре
-			m.Disp.Game.rotate = [0, -90]  # Изометрический поворот как в игре
-			m.config['zoom'] = original_zoom  # Тот же зум что и в игре
-			
-			# Создаем временные позиции клеток для фона
-			temp_cells = []
-			for y in range(8):
-				row = []
-				for x in range(8):
-					offset_x = x * 50*m.config['zoom'] - 175*m.config['zoom']
-					offset_y = y * 50*m.config['zoom'] - 175*m.config['zoom']
-
-					rotated_x = offset_x * math.cos(math.pi*m.Disp.Game.rotate[0]/180) - offset_y * math.sin(math.pi*m.Disp.Game.rotate[0]/180)
-					rotated_y = (offset_x * math.sin(math.pi*m.Disp.Game.rotate[0]/180) + offset_y * math.cos(math.pi*m.Disp.Game.rotate[0]/180))*math.sin(math.pi*m.Disp.Game.rotate[1]/180)
-
-					draw_x = int(m.Disp.width//2 + rotated_x)
-					draw_y = int(m.Disp.height//2 + rotated_y)
+		# Градиентный фон
+		bg_base = colors['bg']
+		for i in range(m.Disp.height):
+			progress = i / m.Disp.height
+			r = int(bg_base[0] * (1.0 + progress * 0.3))
+			g = int(bg_base[1] * (1.0 + progress * 0.3))
+			b = int(bg_base[2] * (1.0 + progress * 0.3))
+			pygame.draw.line(screen, (r, g, b), (0, i), (m.Disp.width, i))
+		
+		# СИНХРОНИЗИРОВАННОЕ вращение (один оборот за ~60 секунд)
+		rotation_angle = (m.global_time * 6.0) % 360
+		
+		# Параметры доски
+		center_x, center_y = m.Disp.width // 2, m.Disp.height // 2 - 40
+		tile_size = 64
+		
+		angle_rad = math.radians(rotation_angle)
+		cos_a = math.cos(angle_rad)
+		sin_a = math.sin(angle_rad)
+		
+		# Рисуем каждую клетку как деформирующийся квад
+		grid = []
+		for gy in range(8):
+			for gx in range(8):
+				# 4 угла клетки в 3D (до вращения)
+				corners_3d = []
+				for dx, dz in [(-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)]:
+					x3d = (gx + dx - 4) * tile_size
+					z3d = (gy + dz - 4) * tile_size
 					
-					points = m.Disp.Game.square(m, (draw_x, draw_y), 50/(math.pi/2.2))
-					row.append(points)
-				temp_cells.append(row)
-			
-			# Рисуем основу доски
-			board = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),400)
-			back = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),283)
-			
-			# Основной фон доски
-			pygame.draw.polygon(self.background_surface, colors['bg'], board)
-			pygame.draw.polygon(self.background_surface, colors['chessboard'], back)
-			
-			# Рисуем клетки шахматной доски напрямую на поверхность (оптимизированно)
-			for y in range(8):
-				for x in range(8):
-					if (x+y)%2 == 1:  # Светлые клетки
-						# Рисуем полупрозрачные светлые клетки
-						light_color = (*colors['light_cell'], 120)
-						pygame.draw.polygon(self.background_surface, light_color, temp_cells[y][x])
-			
-			# Восстанавливаем оригинальные настройки
-			m.Disp.Game.rotate = original_rotate
-			m.config['zoom'] = original_zoom
-			
-			self.background_cached = True
-
-		# Рисуем кешированную поверхность с анимацией
-		intro = min(1.0, self.intro_t)
-		offset_y = int((1.0 - intro) * m.Disp.height * 0.10)
+					# Вращаем вокруг Y оси
+					rx = x3d * cos_a - z3d * sin_a
+					rz = x3d * sin_a + z3d * cos_a
+					
+					# Изометрическая проекция
+					px = center_x + rx - rz * 0.5
+					py = center_y + (rx * 0.5 + rz * 0.5) * 0.5
+					corners_3d.append((px, py))
+				
+				# Центр для сортировки
+				center_z = (gx - 3.5) * tile_size * sin_a + (gy - 3.5) * tile_size * cos_a
+				grid.append((gx, gy, corners_3d, center_z))
 		
-		screen.blit(self.background_surface, (0, offset_y))
+		# Подложка доски
+		board_corners = []
+		for corner_x, corner_z in [(-4, -4), (4, -4), (4, 4), (-4, 4)]:
+			x3d = corner_x * tile_size
+			z3d = corner_z * tile_size
+			rx = x3d * cos_a - z3d * sin_a
+			rz = x3d * sin_a + z3d * cos_a
+			px = center_x + rx - rz * 0.5
+			py = center_y + (rx * 0.5 + rz * 0.5) * 0.5
+			board_corners.append((px, py))
+		
+		# Тень под доской
+		shadow_corners = [(x + 8, y + 12) for x, y in board_corners]
+		pygame.draw.polygon(screen, (0, 0, 0, 100), shadow_corners)
+		pygame.draw.polygon(screen, colors['chessboard'], board_corners)
+		
+		# Сортируем по глубине
+		grid.sort(key=lambda cell: cell[3])
+		
+		# Рисуем клетки
+		for gx, gy, corners, _ in grid:
+			# Тень
+			shadow = [(px + 2, py + 3) for px, py in corners]
+			pygame.draw.polygon(screen, (0, 0, 0, 40), shadow)
+			
+			# Цвет клетки
+			color = colors['light_cell'] if (gx + gy) % 2 == 1 else colors['dark_cell']
+			
+			pygame.draw.polygon(screen, color, corners)
+			pygame.draw.polygon(screen, (0, 0, 0, 30), corners, 1)
+	
+	def iso_diamond(self, cx, cy, w, h, scale=1.0):
+		"""Создает ромб (изометрическая клетка)"""
+		hw = (w * scale) / 2
+		hh = (h * scale) / 2
+		return [(cx, cy - hh), (cx + hw, cy), (cx, cy + hh), (cx - hw, cy)]
+
+	def update_and_draw_particles(self, m):
+		"""Обновление и отрисовка атмосферных частиц"""
+		import random
+		screen = m.Disp.screen
+		W, H = m.Disp.width, m.Disp.height
+		
+		# Обновляем частицы
+		for p in self.particles[:]:
+			p['x'] += p['vx'] * 0.016  # ~60 FPS
+			p['y'] += p['vy'] * 0.016
+			p['life'] -= 0.008
+			
+			# Перезапускаем частицу если она вышла за границы или умерла
+			if p['y'] < -10 or p['x'] < -10 or p['x'] > W + 10 or p['life'] <= 0:
+				p['x'] = random.uniform(0, W)
+				p['y'] = H + 10
+				p['vx'] = random.uniform(-15, 15)
+				p['vy'] = random.uniform(-30, -10)
+				p['life'] = random.uniform(0.5, 1.0)
+				p['alpha'] = random.randint(50, 150)
+		
+		# Рисуем частицы с эффектом intro
+		intro = min(1.0, self.intro_t * 1.5)
+		for p in self.particles:
+			if p['life'] > 0:
+				alpha = int(p['alpha'] * p['life'] * intro)
+				size = p['size']
+				if size > 0 and alpha > 0:
+					# Мягкий круг с градиентом
+					surf = pygame.Surface((size * 4, size * 4), pygame.SRCALPHA)
+					for r in range(size, 0, -1):
+						a = int(alpha * (r / size))
+						pygame.draw.circle(surf, (255, 255, 255, a), (size * 2, size * 2), r)
+					screen.blit(surf, (int(p['x'] - size * 2), int(p['y'] - size * 2)))
 
 	def draw_title(self,m):
 
 		text = "CHESS ISOMETRY REWORK"
 		intro = min(1.0, self.intro_t)
 		slide = int((1.0 - intro) * 40)
-		title = self.title_font.render(text, True, (255,255,255))
-		rect = title.get_rect(center=(m.Disp.width//2, int(m.Disp.height*0.25) + slide))
+		
+		# Легкая вибрация заголовка
+		vibration = math.sin(self.pulse) * 2 if intro >= 1.0 else 0
+		
+		# Цветовой пульс для заголовка
+		pulse_brightness = int(255 - abs(math.sin(self.pulse * 0.3)) * 30)
+		title_color = (pulse_brightness, pulse_brightness, pulse_brightness)
+		
+		title = self.title_font.render(text, True, title_color)
+		
+		# Тень под заголовком для глубины
+		shadow = self.title_font.render(text, True, (0, 0, 0, 128))
+		shadow_rect = shadow.get_rect(center=(m.Disp.width//2 + vibration + 3, int(m.Disp.height*0.25) + slide + 3))
+		shadow_surf = pygame.Surface(shadow.get_size(), pygame.SRCALPHA)
+		shadow_surf.blit(shadow, (0, 0))
+		shadow_surf.set_alpha(int(100 * intro))
+		m.Disp.screen.blit(shadow_surf, shadow_rect)
+		
+		rect = title.get_rect(center=(m.Disp.width//2 + vibration, int(m.Disp.height*0.25) + slide))
 		m.Disp.screen.blit(title, rect)
 
 		sub = self.text_font.render("1.0", True, (200,200,200))
@@ -282,6 +359,18 @@ class Menu:
 			y_slide = int((1.0 - local) * 60)
 			alpha = int(255 * local)
 			animated_rect = pygame.Rect(rect.x, rect.y + y_slide, rect.width, rect.height)
+			
+			# Эффект свечения при hover с импульсом
+			if is_hover:
+				glow_pulse = abs(math.sin(self.pulse * 0.5)) * 0.3 + 0.7
+				glow_size = 8
+				glow_surface = pygame.Surface((animated_rect.width + glow_size * 2, animated_rect.height + glow_size * 2), pygame.SRCALPHA)
+				for i in range(glow_size, 0, -1):
+					glow_alpha = int((30 * (i / glow_size)) * glow_pulse * local)
+					glow_rect = pygame.Rect(glow_size - i, glow_size - i, animated_rect.width + i * 2, animated_rect.height + i * 2)
+					pygame.draw.rect(glow_surface, (100, 150, 255, glow_alpha), glow_rect, border_radius=8 + i)
+				m.Disp.screen.blit(glow_surface, (animated_rect.x - glow_size, animated_rect.y - glow_size))
+			
 			surface = pygame.Surface((animated_rect.width, animated_rect.height), pygame.SRCALPHA)
 			pygame.draw.rect(surface, (*base_color, alpha), surface.get_rect(), border_radius=8)
 			pygame.draw.rect(surface, (*colors['chessboard'], alpha), surface.get_rect(), 2, border_radius=8)

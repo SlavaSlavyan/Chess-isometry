@@ -23,11 +23,6 @@ class Multiplayer:
         # Анимация
         self.pulse = 0
         self.intro_t = 0.0
-        
-        # Кеш для фоновой поверхности
-        self.background_surface = None
-        self.background_cached = False
-        self.cached_size = (0, 0)  # Запоминаем размер для которого создан фон
     
     def get_resource_path(self, relative_path):
         """Получить абсолютный путь к ресурсу"""
@@ -63,69 +58,81 @@ class Multiplayer:
         self.intro_t += 1/60.0
     
     def draw_background(self, m):
-        """Рисует фон как в главном меню"""
+        """Рисует фон с медленно вращающейся изометрической доской"""
         screen = m.Disp.screen
         colors = m.Disp.colors['Game']
-        screen.fill(colors['bg'])
         
-        # Проверяем изменился ли размер экрана
-        current_size = (m.Disp.width, m.Disp.height)
-        if current_size != self.cached_size:
-            self.background_cached = False
-            self.cached_size = current_size
+        # Градиентный фон
+        bg_base = colors['bg']
+        for i in range(m.Disp.height):
+            progress = i / m.Disp.height
+            r = int(bg_base[0] * (1.0 + progress * 0.3))
+            g = int(bg_base[1] * (1.0 + progress * 0.3))
+            b = int(bg_base[2] * (1.0 + progress * 0.3))
+            pygame.draw.line(screen, (r, g, b), (0, i), (m.Disp.width, i))
         
-        # Используем тот же фон что и в меню
-        if not self.background_cached:
-            self.background_surface = pygame.Surface((m.Disp.width, m.Disp.height), pygame.SRCALPHA)
-            
-            # Сохраняем оригинальные настройки
-            original_rotate = m.Disp.Game.rotate[:]
-            original_zoom = m.config['zoom']
-            
-            # Используем настройки как в игре
-            m.Disp.Game.rotate = [0, -90]
-            m.config['zoom'] = original_zoom
-            
-            # Создаем временные позиции клеток
-            temp_cells = []
-            for y in range(8):
-                row = []
-                for x in range(8):
-                    offset_x = x * 50*m.config['zoom'] - 175*m.config['zoom']
-                    offset_y = y * 50*m.config['zoom'] - 175*m.config['zoom']
-                    
-                    rotated_x = offset_x * math.cos(math.pi*m.Disp.Game.rotate[0]/180) - offset_y * math.sin(math.pi*m.Disp.Game.rotate[0]/180)
-                    rotated_y = (offset_x * math.sin(math.pi*m.Disp.Game.rotate[0]/180) + offset_y * math.cos(math.pi*m.Disp.Game.rotate[0]/180))*math.sin(math.pi*m.Disp.Game.rotate[1]/180)
-                    
-                    draw_x = int(m.Disp.width//2 + rotated_x)
-                    draw_y = int(m.Disp.height//2 + rotated_y)
-                    
-                    points = m.Disp.Game.square(m, (draw_x, draw_y), 50/(math.pi/2.2))
-                    row.append(points)
-                temp_cells.append(row)
-            
-            # Рисуем основу доски
-            board = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),400)
-            back = m.Disp.Game.square(m,(m.Disp.width//2,m.Disp.height//2),283)
-            
-            pygame.draw.polygon(self.background_surface, colors['bg'], board)
-            pygame.draw.polygon(self.background_surface, colors['chessboard'], back)
-            
-            # Рисуем клетки
-            for y in range(8):
-                for x in range(8):
-                    if (x+y)%2 == 1:
-                        light_color = (*colors['light_cell'], 120)
-                        pygame.draw.polygon(self.background_surface, light_color, temp_cells[y][x])
-            
-            # Восстанавливаем настройки
-            m.Disp.Game.rotate = original_rotate
-            m.config['zoom'] = original_zoom
-            
-            self.background_cached = True
+        # СИНХРОНИЗИРОВАННОЕ вращение
+        rotation_angle = (m.global_time * 6.0) % 360
         
-        # Отображаем фон
-        screen.blit(self.background_surface, (0, 0))
+        # Параметры доски
+        center_x, center_y = m.Disp.width // 2, m.Disp.height // 2 - 40
+        tile_size = 64
+        
+        angle_rad = math.radians(rotation_angle)
+        cos_a = math.cos(angle_rad)
+        sin_a = math.sin(angle_rad)
+        
+        # Рисуем каждую клетку как деформирующийся квад
+        grid = []
+        for gy in range(8):
+            for gx in range(8):
+                corners_3d = []
+                for dx, dz in [(-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)]:
+                    x3d = (gx + dx - 4) * tile_size
+                    z3d = (gy + dz - 4) * tile_size
+                    
+                    rx = x3d * cos_a - z3d * sin_a
+                    rz = x3d * sin_a + z3d * cos_a
+                    
+                    px = center_x + rx - rz * 0.5
+                    py = center_y + (rx * 0.5 + rz * 0.5) * 0.5
+                    corners_3d.append((px, py))
+                
+                center_z = (gx - 3.5) * tile_size * sin_a + (gy - 3.5) * tile_size * cos_a
+                grid.append((gx, gy, corners_3d, center_z))
+        
+        # Подложка доски
+        board_corners = []
+        for corner_x, corner_z in [(-4, -4), (4, -4), (4, 4), (-4, 4)]:
+            x3d = corner_x * tile_size
+            z3d = corner_z * tile_size
+            rx = x3d * cos_a - z3d * sin_a
+            rz = x3d * sin_a + z3d * cos_a
+            px = center_x + rx - rz * 0.5
+            py = center_y + (rx * 0.5 + rz * 0.5) * 0.5
+            board_corners.append((px, py))
+        
+        shadow_corners = [(x + 8, y + 12) for x, y in board_corners]
+        pygame.draw.polygon(screen, (0, 0, 0, 100), shadow_corners)
+        pygame.draw.polygon(screen, colors['chessboard'], board_corners)
+        
+        # Сортируем по глубине
+        grid.sort(key=lambda cell: cell[3])
+        
+        # Рисуем клетки
+        for gx, gy, corners, _ in grid:
+            shadow = [(px + 2, py + 3) for px, py in corners]
+            pygame.draw.polygon(screen, (0, 0, 0, 40), shadow)
+            
+            color = colors['light_cell'] if (gx + gy) % 2 == 1 else colors['dark_cell']
+            pygame.draw.polygon(screen, color, corners)
+            pygame.draw.polygon(screen, (0, 0, 0, 30), corners, 1)
+    
+    def iso_diamond(self, cx, cy, w, h, scale=1.0):
+        """Создает ромб"""
+        hw = (w * scale) / 2
+        hh = (h * scale) / 2
+        return [(cx, cy - hh), (cx + hw, cy), (cx, cy + hh), (cx - hw, cy)]
     
     def draw_main_menu(self, m):
         """Рисует главное меню мультиплеера"""

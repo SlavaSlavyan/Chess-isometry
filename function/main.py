@@ -40,6 +40,9 @@ class Main:
         # Ограничение FPS
         self.clock = pygame.time.Clock()
         self.target_fps = 60
+        
+        # Глобальное время для синхронизации анимаций (вращение фона)
+        self.global_time = 0.0
 
     def start(self):
 
@@ -122,7 +125,8 @@ class Main:
                 pygame.display.flip()
                 
                 # Ограничиваем FPS
-                self.clock.tick(self.target_fps)
+                dt = self.clock.tick(self.target_fps) / 1000.0  # delta time в секундах
+                self.global_time += dt
                 
             except Exception as e:
                 # Перехватываем все ошибки и показываем окно
@@ -149,7 +153,8 @@ class Main:
                     self.ErrorDisplay.handle_error_input(self, pygame.mouse.get_pos(), close_rect, log_rect)
             
             pygame.display.flip()
-            self.clock.tick(self.target_fps)
+            dt = self.clock.tick(self.target_fps) / 1000.0
+            self.global_time += dt
             
         except Exception as e:
             # Если не можем отобразить окно ошибки, выводим в консоль и закрываем
