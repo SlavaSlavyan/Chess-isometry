@@ -67,11 +67,14 @@ class Game:
             pygame.draw.line(m.Disp.screen,(0,255,0),(m.Disp.width//2,0),(m.Disp.width//2,m.Disp.height))
             pygame.draw.line(m.Disp.screen,(0,0,255),(0,m.Disp.height//2),(m.Disp.width,m.Disp.height//2))
         
-        # Отображаем чат в мультиплеере
-        if hasattr(m.PI.Game, 'multiplayer_mode') and m.PI.Game.multiplayer_mode and hasattr(m, 'ChatSystem'):
-            m.ChatSystem.draw(m.Disp.screen, 20, m.Disp.height - 260)
-        
         self.pulse += 0.05
+        
+        # Отображаем индикаторы голосового чата в мультиплеере (рисуем в самом конце, поверх всего)
+        if hasattr(m.PI.Game, 'multiplayer_mode') and m.PI.Game.multiplayer_mode and hasattr(m, 'VoiceChat'):
+            # Индикатор говорящего игрока (правый верхний угол)
+            m.VoiceChat.draw_speaking_indicator(m.Disp.screen)
+            # Индикатор своего микрофона (левый нижний угол)
+            m.VoiceChat.draw_mute_indicator(m.Disp.screen)
     
     def draw_player_indicator(self, m):
         """Отображает индикатор текущего игрока"""

@@ -22,16 +22,12 @@ class PlayerInput:
 
                 m.stop()
             
-            # Обрабатываем чат в мультиплеере
+            # Обрабатываем переключение микрофона в мультиплеере (клавиша M)
             if (hasattr(self.Game, 'multiplayer_mode') and self.Game.multiplayer_mode and 
-                hasattr(m, 'ChatSystem')):
-                # Если чат обработал событие, не передаем его дальше
-                if m.ChatSystem.handle_key_input(event):
+                hasattr(m, 'VoiceChat')):
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                    m.VoiceChat.toggle_mute()
                     continue
-                # Обрабатываем открытие чата по T
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_t and not m.ChatSystem.input_active:
-                    m.ChatSystem.start_input()
-                    continue  # Не обрабатываем T дальше
             
             self.KI.main(m,event)
             self.MI.main(m,event)

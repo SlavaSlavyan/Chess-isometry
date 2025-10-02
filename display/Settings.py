@@ -16,6 +16,7 @@ class Settings:
         # Кеш для фоновой поверхности  
         self.background_surface = None
         self.background_cached = False
+        self.cached_size = (0, 0)  # Запоминаем размер для которого создан фон
     
     def get_resource_path(self, relative_path):
         """Получить абсолютный путь к ресурсу, работает как в разработке, так и в PyInstaller"""
@@ -35,6 +36,12 @@ class Settings:
         screen = m.Disp.screen
         colors = m.Disp.colors['Game']
         screen.fill(colors['bg'])
+        
+        # Проверяем изменился ли размер экрана
+        current_size = (m.Disp.width, m.Disp.height)
+        if current_size != self.cached_size:
+            self.background_cached = False
+            self.cached_size = current_size
 
         # Создаём фоновую поверхность с шахматной доской только один раз
         if not self.background_cached:

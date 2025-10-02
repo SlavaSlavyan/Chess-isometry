@@ -170,11 +170,6 @@ class NetworkManager:
                 # Клиент отправляет хосту
                 self.socket.send(json_message.encode('utf-8'))
             
-            # ВАЖНО: Обрабатываем локально ТОЛЬКО для отправителя chat_message
-            # Чтобы видеть своё сообщение сразу
-            if message_type == 'chat_message':
-                self._handle_message(message)
-            
             return True
             
         except Exception as e:

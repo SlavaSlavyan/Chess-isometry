@@ -16,6 +16,7 @@ class Menu:
 		# Кеш для фоновой поверхности  
 		self.background_surface = None
 		self.background_cached = False
+		self.cached_size = (0, 0)  # Запоминаем размер для которого создан фон
 		
 		# Кешированные шрифты
 		self.splash_font = pygame.font.Font(self.get_resource_path('data/font/text.ttf'), 16)
@@ -46,6 +47,12 @@ class Menu:
 		screen = m.Disp.screen
 		colors = m.Disp.colors['Game']
 		screen.fill(colors['bg'])
+		
+		# Проверяем изменился ли размер экрана
+		current_size = (m.Disp.width, m.Disp.height)
+		if current_size != self.cached_size:
+			self.background_cached = False
+			self.cached_size = current_size
 
 		# Создаём фоновую поверхность с шахматной доской только один раз
 		if not self.background_cached:
@@ -239,7 +246,7 @@ class Menu:
 			"Особенности:",
 			"Изометрическая проекция",
 			"Анимированные частицы",
-			"Cистема мультиплейлиста",
+			"Система мультиплеера",
 			"Splash-тексты как в Minecraft",
 			"Полная валидация шахматных правил"
 		]
@@ -247,14 +254,7 @@ class Menu:
 		y_offset = title_rect.bottom + 25
 		
 		for line in info_lines:
-			if line.startswith("•"):
-				color = (200, 255, 200)  # Зеленоватый для особенностей
-			elif line == "Автор: Heck43":
-				color = (255, 255, 100)  # Жёлтый для автора
-			elif line == "Chess Isometry Alpha 0.2.7":
-				color = (255, 200, 100)  # Оранжевый для названия
-			else:
-				color = (220, 220, 220)  # Обычный белый
+			color = (220, 220, 220)
 			
 			if line.strip():  # Не рисуем пустые строки
 				line_text = self.about_text_font.render(line, True, color)

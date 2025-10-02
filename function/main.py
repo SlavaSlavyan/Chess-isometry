@@ -99,21 +99,9 @@ class Main:
                             self.stop()
                         self.PI.MI.main(self, event)
                         self.PI.KI.main(self, event)
-                        
-                        # Обрабатываем ввод для чата
-                        if hasattr(self, 'ChatSystem'):
-                            self.ChatSystem.handle_key_input(event)
                     
                     self.Disp.fullscreen_press_check(self)
                     self.Disp.debug_mode_press_check(self)
-                    
-                    # Обрабатываем горячие клавиши для чата
-                    if hasattr(self, 'ChatSystem'):
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_RETURN] and not self.ChatSystem.input_active:
-                            self.ChatSystem.start_input()
-                        elif keys[pygame.K_t] and not self.ChatSystem.input_active:
-                            self.ChatSystem.toggle_visibility()
                     
                     self.Multiplayer.main(self)
                     # Передаем события в мультиплеер для обработки текстового ввода
@@ -170,6 +158,10 @@ class Main:
             self.ErrorHandler.clear_error()
     
     def stop(self):
+        
+        # Останавливаем голосовой чат если активен
+        if hasattr(self, 'VoiceChat'):
+            self.VoiceChat.cleanup()
         
         # Сохраняем настройки звука
         self.config['music_volume'] = self.AudioManager.music_volume

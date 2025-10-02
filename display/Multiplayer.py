@@ -27,6 +27,7 @@ class Multiplayer:
         # Кеш для фоновой поверхности
         self.background_surface = None
         self.background_cached = False
+        self.cached_size = (0, 0)  # Запоминаем размер для которого создан фон
     
     def get_resource_path(self, relative_path):
         """Получить абсолютный путь к ресурсу"""
@@ -66,6 +67,12 @@ class Multiplayer:
         screen = m.Disp.screen
         colors = m.Disp.colors['Game']
         screen.fill(colors['bg'])
+        
+        # Проверяем изменился ли размер экрана
+        current_size = (m.Disp.width, m.Disp.height)
+        if current_size != self.cached_size:
+            self.background_cached = False
+            self.cached_size = current_size
         
         # Используем тот же фон что и в меню
         if not self.background_cached:
@@ -250,9 +257,10 @@ class Multiplayer:
         # Информация о подключенных игроках
         self.draw_player_list(m, m.Disp.width//2 - 200, 160)
         
-        # Чат
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.draw(m.Disp.screen, 50, m.Disp.height - 280)
+        # Индикаторы голосового чата
+        if hasattr(m, 'VoiceChat'):
+            m.VoiceChat.draw_speaking_indicator(m.Disp.screen)
+            m.VoiceChat.draw_mute_indicator(m.Disp.screen)
         
         # Кнопки
         button_labels = {"disconnect": "ОТКЛЮЧИТЬСЯ"}
@@ -280,9 +288,10 @@ class Multiplayer:
         # Список игроков (показываем хоста и себя)
         self.draw_player_list(m, m.Disp.width//2 - 200, 160)
         
-        # Чат
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.draw(m.Disp.screen, 50, m.Disp.height - 280)
+        # Индикаторы голосового чата
+        if hasattr(m, 'VoiceChat'):
+            m.VoiceChat.draw_speaking_indicator(m.Disp.screen)
+            m.VoiceChat.draw_mute_indicator(m.Disp.screen)
         
         # Кнопка отключения (без кнопки старта игры)
         self.draw_buttons(m, m.Multiplayer.buttons, {
@@ -427,17 +436,19 @@ class Multiplayer:
         
         y_offset = y + 35
         
-        # Хост (текущий игрок)
+        # Текущий игрок (хост или клиент)
         if hasattr(m, 'PlayerProfile'):
-            # Аватар хоста
+            # Аватар текущего игрока
             avatar = m.PlayerProfile.get_avatar_surface()
-            avatar_rect = pygame.Rect(x, y_offset, 32, 32)
-            scaled_avatar = pygame.transform.scale(avatar, (32, 32))
-            m.Disp.screen.blit(scaled_avatar, avatar_rect)
+            if avatar:
+                avatar_rect = pygame.Rect(x, y_offset, 32, 32)
+                scaled_avatar = pygame.transform.scale(avatar, (32, 32))
+                m.Disp.screen.blit(scaled_avatar, avatar_rect)
             
-            # Текст хоста
-            host_text = self.text_font.render(f"👑 {m.PlayerProfile.nickname} (Хост)", True, (255, 255, 100))
-            m.Disp.screen.blit(host_text, (x + 40, y_offset + 5))
+            # Текст с ролью
+            role = "(Хост)" if m.Multiplayer.is_host else "(Вы)"
+            player_text = self.text_font.render(f"👑 {m.PlayerProfile.nickname} {role}", True, (255, 255, 100))
+            m.Disp.screen.blit(player_text, (x + 40, y_offset + 5))
             y_offset += 45
         
         # Подключенный игрок

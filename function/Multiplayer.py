@@ -289,13 +289,11 @@ class Multiplayer:
             self.state = "lobby"
             self.connection_status = f"Ожидание игроков... IP: {m.NetworkManager.get_local_ip()}"
             
-            # Инициализируем чат
-            if not hasattr(m, 'ChatSystem'):
-                from function.ChatSystem import ChatSystem
-                m.ChatSystem = ChatSystem()
-                m.ChatSystem.on_message_send = lambda text: self.send_chat_message(m, text)
-            
-            m.ChatSystem.add_system_message("Хост создан! Ожидание игроков...")
+            # Инициализируем голосовой чат
+            if not hasattr(m, 'VoiceChat'):
+                from function.VoiceChatSystem import VoiceChatSystem
+                m.VoiceChat = VoiceChatSystem()
+                m.VoiceChat.initialize()
         else:
             self.connection_error = "Ошибка создания хоста"
             self.status_message_timer = time.time()
@@ -321,11 +319,11 @@ class Multiplayer:
             self.state = "waiting"
             self.connection_status = f"Подключение к {self.host_ip}..."
             
-            # Инициализируем чат
-            if not hasattr(m, 'ChatSystem'):
-                from function.ChatSystem import ChatSystem
-                m.ChatSystem = ChatSystem()
-                m.ChatSystem.on_message_send = lambda text: self.send_chat_message(m, text)
+            # Инициализируем голосовой чат
+            if not hasattr(m, 'VoiceChat'):
+                from function.VoiceChatSystem import VoiceChatSystem
+                m.VoiceChat = VoiceChatSystem()
+                m.VoiceChat.initialize()
             
             # Отправляем данные профиля
             if hasattr(m, 'PlayerProfile'):
@@ -343,8 +341,10 @@ class Multiplayer:
         if hasattr(m, 'PlayerProfile') and hasattr(m, 'NetworkManager'):
             m.NetworkManager.send_message('player_profile', m.PlayerProfile.get_profile_data())
         
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.add_system_message(f"Игрок подключился: {address[0]}")
+        # Запускаем голосовой чат при подключении игрока
+        if hasattr(m, 'VoiceChat') and hasattr(m, 'NetworkManager'):
+            player_name = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
+            m.VoiceChat.start(m.NetworkManager, player_name)
     
     def on_client_disconnected(self, m):
         """Обработчик отключения клиента"""
@@ -352,8 +352,9 @@ class Multiplayer:
         self.game_ready = False
         self.connection_status = "Игрок отключился"
         
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.add_system_message("Игрок отключился")
+        # Останавливаем голосовой чат
+        if hasattr(m, 'VoiceChat'):
+            m.VoiceChat.stop()
     
     def on_connection_lost(self, m):
         """Обработчик потери соединения"""
@@ -361,8 +362,9 @@ class Multiplayer:
         self.connection_error = "Соединение потеряно"
         self.status_message_timer = time.time()
         
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.add_error_message("Соединение потеряно")
+        # Останавливаем голосовой чат
+        if hasattr(m, 'VoiceChat'):
+            m.VoiceChat.stop()
     
     def on_message_received(self, m, message):
         """Обработчик получения сообщений"""
@@ -373,43 +375,33 @@ class Multiplayer:
             self.connected_player = data
             self.game_ready = True
             
-            # Кешируем аватар игрока
-            if data.get('avatar_data') and data.get('avatar_hash'):
-                from function.PlayerProfile import PlayerAvatarCache
-                PlayerAvatarCache.get_avatar(
-                    data.get('nickname', 'Unknown'),
-                    data.get('avatar_hash'),
-                    data.get('avatar_data')
-                )
+            # Кешируем аватар игрока (всегда, даже если процедурный)
+            from function.PlayerProfile import PlayerAvatarCache
+            PlayerAvatarCache.get_avatar(
+                data.get('nickname', 'Unknown'),
+                data.get('avatar_hash', 'default'),
+                data.get('avatar_data', None)
+            )
+            print(f"✅ Профиль игрока получен: {data.get('nickname', 'Unknown')}")
             
-            if hasattr(m, 'ChatSystem'):
-                nickname = data.get('nickname', 'Unknown')
-                m.ChatSystem.add_info_message(f"Игрок {nickname} готов к игре!")
+            # Запускаем голосовой чат когда оба игрока готовы
+            if hasattr(m, 'VoiceChat') and hasattr(m, 'NetworkManager'):
+                if not m.VoiceChat.is_active:
+                    player_name = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
+                    m.VoiceChat.start(m.NetworkManager, player_name)
         
-        elif msg_type == 'chat_message':
-            if hasattr(m, 'ChatSystem'):
-                sender = data.get('sender', 'Unknown')
-                text = data.get('text', '')
-                my_nickname = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
-                
-                # Добавляем только чужие сообщения (свои уже добавлены в send_message)
-                if sender != my_nickname:
-                    m.ChatSystem.add_message(sender, text)
+        elif msg_type == 'voice_data':
+            # Получаем голосовые данные
+            if hasattr(m, 'VoiceChat'):
+                audio_data = data.get('audio')
+                speaker_name = data.get('speaker')
+                if audio_data:
+                    m.VoiceChat.receive_audio(audio_data, speaker_name)
         
         elif msg_type == 'game_start':
             # Запускаем игру
             self.start_multiplayer_game(m)
     
-    def send_chat_message(self, m, text):
-        """Отправляет сообщение в чат"""
-        if hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
-            sender = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
-            
-            # Отправляем другому игроку (без локального добавления)
-            m.NetworkManager.send_message('chat_message', {
-                'sender': sender,
-                'text': text
-            })
     
     def start_multiplayer_game(self, m):
         """Запускает мультиплеер игру"""
@@ -422,20 +414,21 @@ class Multiplayer:
         m.PI.Game.restart_game(m)
         m.PI.Game.setup_multiplayer(m, self.is_host)
         
-        # Убеждаемся что callback чата установлен
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.on_message_send = lambda text: self.send_chat_message(m, text)
-            m.ChatSystem.show()  # Показываем чат
-            m.ChatSystem.add_system_message("🎮 Игра началась!")
-            opponent_team = "черных" if self.is_host else "белых"
-            my_team = "белыми" if self.is_host else "черными"
-            m.ChatSystem.add_info_message(f"Вы играете {my_team}, противник - {opponent_team}")
+        # Убеждаемся что голосовой чат активен
+        if hasattr(m, 'VoiceChat') and hasattr(m, 'NetworkManager'):
+            if not m.VoiceChat.is_active:
+                player_name = getattr(m.PlayerProfile, 'nickname', 'Player') if hasattr(m, 'PlayerProfile') else 'Player'
+                m.VoiceChat.start(m.NetworkManager, player_name)
         
         # Переходим в игру
         m.set_scene('game')
     
     def disconnect(self, m):
         """Отключается от сети"""
+        # Останавливаем голосовой чат
+        if hasattr(m, 'VoiceChat'):
+            m.VoiceChat.stop()
+        
         if hasattr(m, 'NetworkManager'):
             m.NetworkManager.disconnect()
         
@@ -457,10 +450,6 @@ class Multiplayer:
             messages = m.NetworkManager.get_messages()
             for message in messages:
                 self.on_message_received(m, message)
-        
-        # Обновляем чат
-        if hasattr(m, 'ChatSystem'):
-            m.ChatSystem.update(1/60.0)  # Примерно 60 FPS
     
     def load_avatar_file(self, m):
         """Загружает файл аватара через диалог"""

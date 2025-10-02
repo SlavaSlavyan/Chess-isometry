@@ -31,6 +31,8 @@ class PlayerProfile:
         # Генерируем процедурный аватар только если нет сохраненного
         if not self.avatar_surface:
             self.generate_default_avatar()
+            # Сохраняем профиль с хэшом процедурного аватара
+            self.save_profile()
     
     def load_profile(self):
         """Загружает профиль из файла"""
@@ -128,6 +130,19 @@ class PlayerProfile:
         text_surface = font.render(initials, True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(size//2, size//2))
         self.avatar_surface.blit(text_surface, text_rect)
+        
+        # ВАЖНО: Создаем хэш для процедурного аватара чтобы его можно было передать по сети
+        self.avatar_hash = hashlib.md5(pygame.image.tostring(self.avatar_surface, 'RGBA')).hexdigest()
+        
+        # Сохраняем процедурный аватар в файл для постоянства
+        try:
+            os.makedirs(self.avatars_path, exist_ok=True)
+            avatar_file = os.path.join(self.avatars_path, f"{self.avatar_hash}.png")
+            if not os.path.exists(avatar_file):  # Сохраняем только если еще не существует
+                pygame.image.save(self.avatar_surface, avatar_file)
+                print(f"💾 Процедурный аватар сохранен: {self.avatar_hash[:8]}...")
+        except Exception as e:
+            print(f"⚠️ Не удалось сохранить процедурный аватар: {e}")
     
     def get_initials(self) -> str:
         """Получает инициалы из никнейма"""
@@ -168,20 +183,26 @@ class PlayerProfile:
     
     def get_profile_data(self) -> Dict:
         """Возвращает данные профиля для отправки по сети"""
-        # Сериализуем аватар в base64 если есть пользовательский
+        # Убеждаемся что у нас есть аватар
+        if not self.avatar_surface:
+            self.generate_default_avatar()
+        
+        # Сериализуем аватар в base64 (ВСЕГДА, даже если процедурный)
         avatar_data = None
-        if self.avatar_surface and self.avatar_hash:
+        if self.avatar_surface:
             try:
                 import base64
                 # Конвертируем поверхность в строку
                 avatar_string = pygame.image.tostring(self.avatar_surface, 'RGBA')
                 avatar_data = base64.b64encode(avatar_string).decode('utf-8')
-            except:
+                print(f"📤 Отправка аватара: {self.avatar_hash[:8] if self.avatar_hash else 'unknown'}... (размер: {len(avatar_data)} байт)")
+            except Exception as e:
+                print(f"❌ Ошибка сериализации аватара: {e}")
                 avatar_data = None
         
         return {
             'nickname': self.nickname,
-            'avatar_hash': self.avatar_hash,
+            'avatar_hash': self.avatar_hash if self.avatar_hash else 'default',
             'avatar_data': avatar_data,
             'avatar_size': self.default_avatar_size,
             'stats': self.stats,
@@ -261,21 +282,25 @@ class PlayerAvatarCache:
     @staticmethod
     def get_avatar(nickname: str, avatar_hash: str, avatar_data: str = None) -> Optional[pygame.Surface]:
         """Получает аватар игрока из кеша или создает новый"""
-        cache_key = f"{nickname}_{avatar_hash}"
+        # Используем хэш или никнейм для ключа кеша
+        cache_key = f"{nickname}_{avatar_hash if avatar_hash else 'default'}"
         
         # Проверяем кеш
         if cache_key in _avatar_cache:
+            print(f"♻️ Аватар из кеша: {nickname}")
             return _avatar_cache[cache_key]
         
         # Создаем новый аватар
         if avatar_data:
             # Загружаем из данных
             temp_profile = PlayerProfile()
-            if temp_profile.load_avatar_from_data(avatar_data, avatar_hash):
+            if temp_profile.load_avatar_from_data(avatar_data, avatar_hash or 'default'):
+                print(f"📥 Аватар загружен из сети: {nickname}")
                 _avatar_cache[cache_key] = temp_profile.avatar_surface
                 return temp_profile.avatar_surface
         
-        # Создаем процедурный аватар
+        # Создаем процедурный аватар (если нет данных или загрузка не удалась)
+        print(f"🎨 Генерация процедурного аватара для: {nickname}")
         temp_profile = PlayerProfile()
         temp_profile.nickname = nickname
         temp_profile.generate_default_avatar()
