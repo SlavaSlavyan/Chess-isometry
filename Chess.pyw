@@ -4,6 +4,14 @@ import math
 import os
 import time
 import random
+import sys
+
+# Настройка кодировки для Windows
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except:
+        pass
 
 
 def load_config():

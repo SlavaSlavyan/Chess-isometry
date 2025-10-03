@@ -102,3 +102,113 @@ Traceback (most recent call last):
     ^^^^^^^^^^^^^^^^^
 AttributeError: 'Multiplayer' object has no attribute 'draw_profile'
 ================================================================================
+
+================================================================================
+[2025-10-03 18:33:58]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:34:00]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:34:01]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:37:29]
+Тип: AttributeError
+Сообщение: 'Multiplayer' object has no attribute 'connected'
+Файл: main.py
+Строка: 247
+Функция: set_scene
+Код: if hasattr(self, 'Multiplayer') and self.Multiplayer.connected:
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 97, in start
+    self.Menu.main(self)
+    ~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\Menu.py", line 24, in main
+    self.handle_input(m)
+    ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\Menu.py", line 81, in handle_input
+    m.set_scene('multiplayer')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 247, in set_scene
+    if hasattr(self, 'Multiplayer') and self.Multiplayer.connected:
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Multiplayer' object has no attribute 'connected'
+================================================================================

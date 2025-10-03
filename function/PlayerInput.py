@@ -22,6 +22,17 @@ class PlayerInput:
 
                 m.stop()
             
+            # Dev Menu активация (INSERT или F12)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_INSERT or event.key == pygame.K_F12:
+                    m.DevMenu.toggle()
+                    continue
+            
+            # Передаем события в dev menu если он активен
+            if m.DevMenu.active:
+                m.DevMenu.handle_input(m, event)
+                continue  # Блокируем остальной ввод когда dev menu открыт
+            
             # Обрабатываем переключение микрофона в мультиплеере (клавиша M)
             if (hasattr(self.Game, 'multiplayer_mode') and self.Game.multiplayer_mode and 
                 hasattr(m, 'VoiceChat')):

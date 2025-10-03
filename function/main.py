@@ -5,7 +5,11 @@ from function.JsonManager import JsonManager
 from function.AssetManager import AssetManager
 from function.AudioManager import AudioManager
 from function.SplashManager import SplashManager
+from function.CardSystem import CardSystem
+from function.DevMenu import DevMenu
+from function.DiscordRPC import DiscordRPC
 from display.main import Display
+from display.CardUI import CardUI
 from function.PlayerInput import PlayerInput
 from function.Menu import Menu
 from function.Settings import Settings
@@ -24,8 +28,12 @@ class Main:
         self.AssetManager = AssetManager(self)
         self.AudioManager = AudioManager(self)
         self.SplashManager = SplashManager(self)
+        self.CardSystem = CardSystem()
+        self.DevMenu = DevMenu()
+        self.DiscordRPC = DiscordRPC()
         
         self.Disp = Display(self)
+        self.CardUI = CardUI(self)
         self.PI = PlayerInput(self)
         self.Menu = Menu(self)
         self.Settings = Settings(self)
@@ -48,6 +56,13 @@ class Main:
 
         while True:
             try:
+                # Получаем delta time в начале каждого кадра
+                dt = self.clock.tick(self.target_fps) / 1000.0
+                self.global_time += dt
+                
+                # Обновляем dev menu
+                self.DevMenu.update(self, dt)
+                
                 # Если есть активное окно ошибки, показываем его
                 if self.ErrorHandler.is_error_visible():
                     self._handle_error_display()
@@ -60,6 +75,18 @@ class Main:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             self.stop()
+                        
+                        # Dev Menu активация (INSERT или F12)
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_INSERT or event.key == pygame.K_F12:
+                                self.DevMenu.toggle()
+                                continue
+                        
+                        # Передаем события в dev menu если он активен
+                        if self.DevMenu.active:
+                            self.DevMenu.handle_input(self, event)
+                            continue
+                        
                         self.PI.MI.main(self, event)
                         self.PI.KI.main(self, event)
                     
@@ -80,6 +107,18 @@ class Main:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             self.stop()
+                        
+                        # Dev Menu активация (INSERT или F12)
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_INSERT or event.key == pygame.K_F12:
+                                self.DevMenu.toggle()
+                                continue
+                        
+                        # Передаем события в dev menu если он активен
+                        if self.DevMenu.active:
+                            self.DevMenu.handle_input(self, event)
+                            continue
+                        
                         self.PI.MI.main(self, event)
                         self.PI.KI.main(self, event)
                     
@@ -97,9 +136,21 @@ class Main:
                     
                     events = []
                     for event in pygame.event.get():
-                        events.append(event)
                         if event.type == pygame.QUIT:
                             self.stop()
+                        
+                        # Dev Menu активация (INSERT или F12)
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_INSERT or event.key == pygame.K_F12:
+                                self.DevMenu.toggle()
+                                continue
+                        
+                        # Передаем события в dev menu если он активен
+                        if self.DevMenu.active:
+                            self.DevMenu.handle_input(self, event)
+                            continue
+                        
+                        events.append(event)
                         self.PI.MI.main(self, event)
                         self.PI.KI.main(self, event)
                     
@@ -122,11 +173,10 @@ class Main:
                 # Обновляем музыку (проверяем окончание треков)
                 self.AudioManager.update()
                 
-                pygame.display.flip()
+                # Рисуем dev menu поверх всего
+                self.DevMenu.draw(self)
                 
-                # Ограничиваем FPS
-                dt = self.clock.tick(self.target_fps) / 1000.0  # delta time в секундах
-                self.global_time += dt
+                pygame.display.flip()
                 
             except Exception as e:
                 # Перехватываем все ошибки и показываем окно
@@ -168,6 +218,10 @@ class Main:
         if hasattr(self, 'VoiceChat'):
             self.VoiceChat.cleanup()
         
+        # Останавливаем Discord RPC если активен
+        if hasattr(self, 'DiscordRPC'):
+            self.DiscordRPC.disable()
+        
         # Сохраняем настройки звука
         self.config['music_volume'] = self.AudioManager.music_volume
         self.config['sfx_volume'] = self.AudioManager.sfx_volume
@@ -182,6 +236,21 @@ class Main:
             return
         self.prev_scene = self.scene
         self.scene = scene
+        
+        # Обновляем Discord RPC статус
+        if hasattr(self, 'DiscordRPC') and self.DiscordRPC.enabled:
+            if scene == 'menu':
+                self.DiscordRPC.set_menu()
+            elif scene == 'settings':
+                self.DiscordRPC.set_settings()
+            elif scene == 'multiplayer':
+                if hasattr(self, 'Multiplayer') and self.Multiplayer.connected:
+                    self.DiscordRPC.set_multiplayer_lobby(self.Multiplayer.is_host)
+            elif scene == 'game':
+                if hasattr(self, 'PI') and hasattr(self.PI, 'Game'):
+                    player_color = self.PI.Game.local_player_color if hasattr(self.PI.Game, 'local_player_color') else 'white'
+                    self.DiscordRPC.set_in_game(player_color)
+        
         # Сообщаем дисплею о смене сцены — он сам запустит intro-анимацию
         if hasattr(self, 'Disp'):
             setattr(self.Disp, 'last_scene', None)  # заставим Display определить смену

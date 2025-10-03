@@ -190,6 +190,18 @@ class Game:
 
         # Анимации
         self.anim_move = None  # {'from':(x,y),'to':(x,y),'piece':str,'start':ms,'dur':ms,'is_attack':bool}
+        
+        # Система карт
+        self.card_notification = None  # {'card_info': {}, 'timer': int, 'max_timer': int}
+        self.selected_card = None  # {'index': int, 'card': Card, 'requires_target': bool}
+        self.card_target_mode = None  # 'single_cell', 'two_cells', None
+        
+        # Эффекты карт
+        self.extra_move_active = False
+        self.extra_move_player = None
+        self.fog_of_war_active = False
+        self.fog_of_war_owner = None
+        self.fog_of_war_duration = 0
     
     def main(self,m):
 
@@ -348,7 +360,7 @@ class Game:
         
         # Применяем ход напрямую (без анимации для удаленного хода)
         self.make_move(from_pos, to_pos, m)
-        self.switch_player()
+        self.switch_player(m)
         
         print(f"📩 Получен ход противника: {from_pos} -> {to_pos}")
     
@@ -390,7 +402,21 @@ class Game:
             if self.current_player != self.my_team:
                 return
 
+        # Правая кнопка мыши - отменяем выбор карты
+        if m.PI.MI.mouse_click['rt']:
+            if self.selected_card or self.card_target_mode:
+                print("❌ Использование карты отменено")
+                self.selected_card = None
+                self.card_target_mode = None
+                self.card_target_positions = []
+                return
+        
         if m.PI.MI.mouse_click['lt']:
+            # Сначала проверяем клик по картам
+            if hasattr(m, 'CardSystem') and hasattr(m, 'CardUI'):
+                card_clicked = self.handle_card_click(m)
+                if card_clicked:
+                    return  # Если кликнули по карте, не обрабатываем клики по доске
             clicked_cell = None
 
             # Проверяем, на какую клетку кликнули
@@ -509,12 +535,238 @@ class Game:
             if self.multiplayer_mode and hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
                 self.send_move(m, from_pos, to_pos)
             
-            self.switch_player()
+            self.switch_player(m)
             self.clear_all_statuses()
     
-    def switch_player(self):
-        """Переключает текущего игрока"""
+    def switch_player(self, m=None):
+        """Переключает текущего игрока и пытается выдать карту"""
+        old_player = self.current_player
+        
+        # Проверяем эффект двойного хода
+        if self.extra_move_active and self.extra_move_player == old_player:
+            print(f"⚡ Дополнительный ход для {old_player}!")
+            self.extra_move_active = False
+            self.extra_move_player = None
+            # НЕ переключаем игрока, возвращаем управление
+            return
+        
+        # Обычное переключение игрока
         self.current_player = "black" if self.current_player == "white" else "white"
+        
+        # Обновляем эффекты
+        if self.fog_of_war_active:
+            self.fog_of_war_duration -= 1
+            if self.fog_of_war_duration <= 0:
+                self.fog_of_war_active = False
+                print(f"🌫️ Туман войны рассеялся!")
+        
+        # Попытка выдать карту игроку, который ТОЛЬКО ЧТО сходил
+        if m and hasattr(m, 'CardSystem') and self.game_started:
+            dropped_card = m.CardSystem.try_drop_card(old_player)
+            if dropped_card:
+                # Показываем уведомление
+                self.card_notification = {
+                    'card_info': dropped_card.get_info(),
+                    'timer': 120,  # 2 секунды при 60 FPS
+                    'max_timer': 120
+                }
+                print(f"🎴 {old_player} получил карту: {dropped_card.name}")
+            
+            # Вызываем события начала хода для нового игрока
+            m.CardSystem.on_turn_start(self.current_player, self._get_game_state(m))
+    
+    def _get_game_state(self, m):
+        """Возвращает состояние игры для карт с прямым доступом к доске"""
+        # Создаем wrapper который позволяет картам напрямую изменять доску
+        class BoardWrapper:
+            def __init__(self, cells):
+                self.cells = cells
+            
+            def __getitem__(self, y):
+                # board[y][x] -> cells[x][y]
+                class RowWrapper:
+                    def __init__(self, cells, y):
+                        self.cells = cells
+                        self.y = y
+                    
+                    def __getitem__(self, x):
+                        return self.cells[x][self.y]
+                    
+                    def __setitem__(self, x, value):
+                        self.cells[x][self.y] = value
+                
+                return RowWrapper(self.cells, y)
+        
+        return {
+            'board': BoardWrapper(self.cells),
+            'current_player': self.current_player,
+            'move_history': [],
+            'captured_pieces': {'white': [], 'black': []},
+            'm': m,
+            'game': self  # Прямая ссылка на объект игры
+        }
+    
+    def handle_card_click(self, m):
+        """Обрабатывает клики по картам. Возвращает True если кликнули по карте или в режиме выбора цели"""
+        # Если уже в режиме выбора цели, обрабатываем клики по доске
+        if self.selected_card and self.card_target_mode:
+            clicked_cell = None
+            
+            for x in range(8):
+                for y in range(8):
+                    if self.is_point_in_polygon(m.PI.MI.mouse_pos, self.cells[x][y]['points']):
+                        clicked_cell = (x, y)
+                        break
+                if clicked_cell:
+                    break
+            
+            if clicked_cell:
+                if self.card_target_mode == 'single_cell':
+                    # Используем карту с одной целью
+                    target = {'pos': clicked_cell}
+                    success, message = m.CardSystem.use_card(
+                        self.current_player,
+                        self.selected_card['index'],
+                        self._get_game_state(m),
+                        target
+                    )
+                    print(f"{'✅' if success else '❌'} {message}")
+                    # Полностью очищаем состояние карты
+                    self.selected_card = None
+                    self.card_target_mode = None
+                    if hasattr(self, 'card_target_positions'):
+                        self.card_target_positions = []
+                    # Сбрасываем hover карты
+                    m.CardUI.reset_hover()
+                    return True
+                
+                elif self.card_target_mode == 'two_cells':
+                    # Собираем две позиции
+                    if not hasattr(self, 'card_target_positions'):
+                        self.card_target_positions = []
+                    
+                    self.card_target_positions.append(clicked_cell)
+                    
+                    if len(self.card_target_positions) == 1:
+                        print(f"🎯 Первая фигура выбрана: {clicked_cell}. Выберите вторую...")
+                    elif len(self.card_target_positions) == 2:
+                        # Используем карту с двумя целями
+                        target = {
+                            'pos1': self.card_target_positions[0],
+                            'pos2': self.card_target_positions[1]
+                        }
+                        success, message = m.CardSystem.use_card(
+                            self.current_player,
+                            self.selected_card['index'],
+                            self._get_game_state(m),
+                            target
+                        )
+                        print(f"{'✅' if success else '❌'} {message}")
+                        # Полностью очищаем состояние карты
+                        self.selected_card = None
+                        self.card_target_mode = None
+                        self.card_target_positions = []
+                        # Сбрасываем hover карты
+                        m.CardUI.reset_hover()
+                        # После использования возвращаем False чтобы разрешить обычные клики
+                        return False
+                    
+                    return True
+            
+            # Если кликнули мимо, все равно блокируем клик (чтобы не ходили фигурами)
+            return True
+        
+        # Проверяем клик по самим картам
+        hovered_card = m.CardUI.get_hovered_card()
+        
+        if hovered_card is not None:
+            # Получаем карты текущего игрока
+            cards = m.CardSystem.get_player_cards(self.current_player)
+            
+            if hovered_card < len(cards):
+                card = cards[hovered_card]
+                
+                # Проверяем можно ли использовать карту
+                can_use, reason = card.can_use(self._get_game_state(m))
+                
+                if not can_use:
+                    print(f"❌ Нельзя использовать карту: {reason}")
+                    # Если карту нельзя использовать - НЕ блокируем клики, возвращаем False
+                    return False
+                
+                # Проверяем требует ли карта цель
+                card_name = card.__class__.__name__
+                
+                # Карты которые не требуют цели - используем сразу
+                if card_name in ['DoubleMove', 'FogOfWar']:
+                    success, message = m.CardSystem.use_card(
+                        self.current_player,
+                        hovered_card,
+                        self._get_game_state(m),
+                        None
+                    )
+                    print(f"{'✅' if success else '❌'} {message}")
+                    # Сбрасываем выбор после использования
+                    self.selected_card = None
+                    self.card_target_mode = None
+                    if hasattr(self, 'card_target_positions'):
+                        self.card_target_positions = []
+                    m.CardUI.reset_hover()
+                    # Возвращаем False чтобы разрешить обычные клики после использования
+                    return False
+                
+                # Карты требующие цель - переходим в режим выбора
+                elif card_name in ['KnightSwap']:
+                    self.selected_card = {
+                        'index': hovered_card,
+                        'card': card,
+                        'name': card_name
+                    }
+                    self.card_target_mode = 'two_cells'
+                    self.card_target_positions = []
+                    print(f"🎯 Выберите две фигуры для обмена...")
+                    # В режиме выбора цели блокируем обычные клики
+                    return True
+                
+                elif card_name in ['HealPiece']:
+                    self.selected_card = {
+                        'index': hovered_card,
+                        'card': card,
+                        'name': card_name
+                    }
+                    self.card_target_mode = 'single_cell'
+                    print(f"🎯 Выберите пустую клетку для воскрешения...")
+                    # В режиме выбора цели блокируем обычные клики
+                    return True
+                
+                elif card_name in ['TimeRewind']:
+                    # TimeRewind пока используем без цели
+                    success, message = m.CardSystem.use_card(
+                        self.current_player,
+                        hovered_card,
+                        self._get_game_state(m),
+                        None
+                    )
+                    print(f"{'✅' if success else '❌'} {message}")
+                    # Сбрасываем выбор после использования
+                    self.selected_card = None
+                    self.card_target_mode = None
+                    if hasattr(self, 'card_target_positions'):
+                        self.card_target_positions = []
+                    m.CardUI.reset_hover()
+                    # Возвращаем False чтобы разрешить обычные клики
+                    return False
+                
+                # Если карта неизвестного типа - не блокируем
+                else:
+                    print(f"⚠️ Неизвестный тип карты: {card_name}")
+                    return False
+            
+            # Если кликнули по карте, но она не была обработана - не блокируем
+            return False
+        
+        # Если не кликнули ни по карте, ни в режиме выбора - разрешаем обычные клики
+        return False
     
     def find_king(self, team):
         """Находит позицию короля указанной команды"""

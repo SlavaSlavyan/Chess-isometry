@@ -23,7 +23,7 @@ class Multiplayer:
         # Анимация
         self.pulse = 0
         self.intro_t = 0.0
-    
+        
     def get_resource_path(self, relative_path):
         """Получить абсолютный путь к ресурсу"""
         if hasattr(sys, '_MEIPASS'):

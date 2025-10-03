@@ -75,6 +75,44 @@ class Game:
             m.VoiceChat.draw_speaking_indicator(m.Disp.screen)
             # Индикатор своего микрофона (левый нижний угол)
             m.VoiceChat.draw_mute_indicator(m.Disp.screen)
+        
+        # Отображаем карты текущего игрока
+        if hasattr(m, 'CardSystem') and not m.PI.Game.game_over:
+            current_player = m.PI.Game.current_player
+            cards_info = m.CardSystem.get_card_info_list(current_player)
+            selected_card_idx = m.PI.Game.selected_card['index'] if m.PI.Game.selected_card else None
+            m.CardUI.draw_player_hand(m.Disp.screen, cards_info, current_player, m.Disp.width, m.Disp.height, selected_card_idx)
+        
+        # Показываем подсказку если выбрана карта требующая цель
+        if hasattr(m.PI.Game, 'card_target_mode') and m.PI.Game.card_target_mode:
+            hint_font = self.font_small
+            if m.PI.Game.card_target_mode == 'single_cell':
+                hint_text = "🎯 Выберите клетку (ПКМ для отмены)"
+            elif m.PI.Game.card_target_mode == 'two_cells':
+                positions_count = len(getattr(m.PI.Game, 'card_target_positions', []))
+                if positions_count == 0:
+                    hint_text = "🎯 Выберите первую фигуру (ПКМ для отмены)"
+                else:
+                    hint_text = "🎯 Выберите вторую фигуру (ПКМ для отмены)"
+            else:
+                hint_text = "🎯 Выбрана карта (ПКМ для отмены)"
+            
+            hint_render = hint_font.render(hint_text, True, (255, 200, 50))
+            hint_rect = hint_render.get_rect(center=(m.Disp.width//2, 50))
+            
+            # Фон для подсказки
+            bg_surface = pygame.Surface((hint_rect.width + 20, hint_rect.height + 10), pygame.SRCALPHA)
+            pygame.draw.rect(bg_surface, (0, 0, 0, 180), (0, 0, hint_rect.width + 20, hint_rect.height + 10), border_radius=5)
+            m.Disp.screen.blit(bg_surface, (hint_rect.x - 10, hint_rect.y - 5))
+            m.Disp.screen.blit(hint_render, hint_rect)
+        
+        # Показываем уведомление о новой карте если есть
+        if hasattr(m.PI.Game, 'card_notification'):
+            notif = m.PI.Game.card_notification
+            if notif and notif['timer'] > 0:
+                progress = notif['timer'] / notif['max_timer']
+                m.CardUI.draw_card_notification(m.Disp.screen, notif['card_info'], m.Disp.width, m.Disp.height, progress)
+                notif['timer'] -= 1
     
     def draw_player_indicator(self, m):
         """Отображает индикатор текущего игрока"""
