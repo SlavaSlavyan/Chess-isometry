@@ -52,8 +52,6 @@ class DevMenu:
                 {'type': 'checkbox', 'name': 'FPS Counter', 'var': 'fps_counter', 'value': False},
                 {'type': 'checkbox', 'name': 'Performance Monitor', 'var': 'perf_monitor', 'value': False},
                 {'type': 'slider', 'name': 'Target FPS', 'var': 'target_fps', 'min': 30, 'max': 240, 'value': 60},
-                {'type': 'dropdown', 'name': 'Engine', 'var': 'engine', 'items': ['pygame', 'panda3d'], 'value': 'pygame'},
-                {'type': 'button', 'name': 'Apply Engine (restart)', 'action': 'apply_engine'},
                 {'type': 'button', 'name': 'Reload Cards Module', 'action': 'reload_cards'},
                 {'type': 'button', 'name': 'Force GC Collect', 'action': 'force_gc'},
                 {'type': 'button', 'name': 'Print Game State', 'action': 'print_state'},
@@ -217,14 +215,6 @@ class DevMenu:
         except:
             print(f"[CFG] [DEV MENU] Action: {action}")
         
-        if action == 'apply_engine':
-            selected = self.option_states.get('engine', 'pygame')
-            m.config['engine'] = selected
-            m.JsonManager.save('data\\config', m.config)
-            print(f"🔁 Switching engine to: {selected}. Restarting...")
-            setattr(m, 'request_restart', True)
-            return
-
         if action == 'win_white':
             m.PI.Game.game_over = True
             m.PI.Game.winner = 'white'
@@ -779,8 +769,6 @@ class DevMenu:
             self._draw_slider(screen, x + width - 200, y + 8, 180, option)
         elif option['type'] == 'button':
             self._draw_button(screen, x + width - 100, y + 5, 90, option, is_hover)
-        elif option['type'] == 'dropdown':
-            self._draw_dropdown(screen, x + width - 200, y + 5, 180, option)
     
     def _draw_checkbox(self, screen, x, y, option):
         """Отрисовка чекбокса"""
@@ -834,29 +822,6 @@ class DevMenu:
         btn_text = small_font.render("Execute", True, (255, 255, 255))
         text_rect = btn_text.get_rect(center=(x + width // 2, y + 12))
         screen.blit(btn_text, text_rect)
-
-    def _draw_dropdown(self, screen, x, y, width, option):
-        """Отрисовка простого дропдауна (без выпадающего списка, клик по области циклично переключает)"""
-        value = self.option_states.get(option['var'], option.get('value'))
-        items = option.get('items', [])
-        rect = pygame.Rect(x, y, width, 25)
-        pygame.draw.rect(screen, (40, 40, 60), rect, border_radius=5)
-        pygame.draw.rect(screen, (150, 150, 150), rect, 2, border_radius=5)
-        small_font = pygame.font.Font(None, 16)
-        text = small_font.render(str(value), True, (255, 255, 255))
-        text_rect = text.get_rect(center=(x + width // 2, y + 12))
-        screen.blit(text, text_rect)
-        # Обработка клика по дропдауну
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_pressed = pygame.mouse.get_pressed()[0]
-        if mouse_pressed and rect.collidepoint(mouse_pos):
-            if items:
-                try:
-                    idx = items.index(value)
-                except ValueError:
-                    idx = -1
-                idx = (idx + 1) % len(items)
-                self.option_states[option['var']] = items[idx]
     
     def _draw_fps_counter(self, screen, W, H):
         """FPS счетчик"""

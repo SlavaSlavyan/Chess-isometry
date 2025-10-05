@@ -25,9 +25,6 @@ class Main:
         pygame.init()
 
         self.JsonManager = JsonManager(self)
-        
-        # Метка текущего режима для синхронизации
-        self.current_mode = '2d'
         self.AssetManager = AssetManager(self)
         self.AudioManager = AudioManager(self)
         self.SplashManager = SplashManager(self)
@@ -56,7 +53,7 @@ class Main:
         self.global_time = 0.0
 
     def start(self):
-        self.request_restart = False
+
         while True:
             try:
                 # Получаем delta time в начале каждого кадра
@@ -180,11 +177,6 @@ class Main:
                 self.DevMenu.draw(self)
                 
                 pygame.display.flip()
-                # Проверка запроса на рестарт (например, смена движка)
-                if getattr(self, 'request_restart', False):
-                    pygame.quit()
-                    import os
-                    os.execv(sys.executable, [sys.executable, 'Chess.pyw'])
                 
             except Exception as e:
                 # Перехватываем все ошибки и показываем окно

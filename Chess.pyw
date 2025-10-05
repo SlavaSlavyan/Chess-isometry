@@ -214,15 +214,6 @@ if __name__ == '__main__':
     show_loading()
 
     # Переход к основной игре
-    cfg = load_config()
-
-if cfg.get('engine', 'pygame') == 'panda3d':
-    # Запуск Panda3D варианта
-    pygame.quit()
-    from function.p3d.app import run_panda_app
-    run_panda_app()
-    sys.exit(0)
-else:
-    from function.main import Main
-    Chess = Main()
-    Chess.start()
+from function.main import Main
+Chess = Main()
+Chess.start()

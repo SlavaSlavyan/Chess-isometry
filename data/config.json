@@ -1,14 +1,13 @@
 {
-    "fullscreen": false,
+    "fullscreen": true,
     "start-size": [
         1200,
         800
     ],
     "them": "base",
-    "zoom": 1.5,
+    "zoom": 1.1,
     "f3": true,
     "bg_mode": "2d",
     "music_volume": 0.285,
-    "sfx_volume": 0.83,
-    "engine": "pygame"
+    "sfx_volume": 0.83
 }

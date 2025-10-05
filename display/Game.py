@@ -9,7 +9,6 @@ class Game:
 
         self.rotate = [0,-90]
         self.pulse = 0
-        self.last_sync_check = 0  # Для синхронизации с 3D режимом
         # Эффект тряски экрана
         self.shake_time_ms = 0
         self.shake_amp = 0
@@ -32,18 +31,6 @@ class Game:
 
     def main(self,m):
         
-        # Проверяем синхронизацию с 3D режимом (раз в 0.1 секунды для реального времени)
-        import time
-        current_time = time.time()
-        if current_time - self.last_sync_check >= 0.1:
-            self.last_sync_check = current_time
-            if hasattr(m.PI.Game, 'sync'):
-                state = m.PI.Game.sync.load_state()
-                if state:
-                    # Обновляем если ход сделан другим игроком в другом режиме
-                    if state.get('mode') != getattr(m, 'current_mode', '2d'):
-                        m.PI.Game.sync.apply_state_to_2d(m.PI.Game, state)
-        
         # Смещение экрана из-за тряски
         ox, oy = 0, 0
         if self.shake_time_ms > 0:
@@ -62,9 +49,6 @@ class Game:
         else:
             self.cells(m, (ox, oy))
             self.chessboard(m)
-        
-        # Рисуем маркер FPS игрока (если он в 3D режиме)
-        self.draw_fps_player_marker(m, (ox, oy))
         
         # Обновляем и рисуем частицы
         self.update_particles()
@@ -445,70 +429,3 @@ class Game:
             return
         dt = m.clock.get_time()
         self.shake_time_ms = max(0, self.shake_time_ms - dt)
-    
-    def draw_fps_player_marker(self, m, offset=(0,0)):
-        """Отрисовывает маркер позиции FPS игрока на доске"""
-        if not hasattr(m.PI.Game, 'sync'):
-            return
-        
-        fps_pos = m.PI.Game.sync.get_fps_player_position()
-        if not fps_pos:
-            return
-        
-        x, y, height = fps_pos
-        
-        # Конвертируем 3D координаты в экранные координаты
-        # Используем изометрическую проекцию как в основной игре
-        screen_x, screen_y = self._world_to_screen(m, x, y)
-        screen_x += offset[0]
-        screen_y += offset[1]
-        
-        # Пульсирующий маркер (зелёный круг)
-        import time
-        pulse = abs(math.sin(time.time() * 3.0))  # Быстрая пульсация
-        radius = int(15 + pulse * 8)
-        alpha = int(150 + pulse * 105)
-        
-        # Создаём полупрозрачную поверхность для маркера
-        marker_surface = pygame.Surface((radius * 3, radius * 3), pygame.SRCALPHA)
-        
-        # Внешнее кольцо (зелёное)
-        pygame.draw.circle(marker_surface, (0, 255, 100, alpha // 2), 
-                          (radius * 3 // 2, radius * 3 // 2), radius, 3)
-        # Внутренний круг
-        pygame.draw.circle(marker_surface, (100, 255, 150, alpha), 
-                          (radius * 3 // 2, radius * 3 // 2), radius // 2)
-        
-        # Крестик в центре
-        center = radius * 3 // 2
-        cross_size = radius // 3
-        pygame.draw.line(marker_surface, (255, 255, 255, alpha),
-                        (center - cross_size, center), (center + cross_size, center), 2)
-        pygame.draw.line(marker_surface, (255, 255, 255, alpha),
-                        (center, center - cross_size), (center, center + cross_size), 2)
-        
-        # Отображаем маркер
-        m.Disp.screen.blit(marker_surface, 
-                          (screen_x - radius * 3 // 2, screen_y - radius * 3 // 2))
-        
-        # Текст с высотой (если включен F3)
-        if m.config.get('f3', False):
-            font = pygame.font.Font(None, 20)
-            text = font.render(f"FPS Player (h:{height:.1f}m)", True, (100, 255, 100))
-            m.Disp.screen.blit(text, (screen_x + radius + 5, screen_y - 10))
-    
-    def _world_to_screen(self, m, world_x, world_y):
-        """Конвертирует 3D координаты в экранные координаты используя изометрическую проекцию"""
-        z = m.config['zoom']
-        
-        # Применяем ту же логику что и в createpos()
-        offset_x = world_x * 50*z - 175*z
-        offset_y = world_y * 50*z - 175*z
-
-        rotated_x = offset_x * math.cos(math.pi*self.rotate[0]/180) - offset_y * math.sin(math.pi*self.rotate[0]/180)
-        rotated_y = (offset_x * math.sin(math.pi*self.rotate[0]/180) + offset_y * math.cos(math.pi*self.rotate[0]/180))*math.sin(math.pi*self.rotate[1]/180)
-
-        draw_x = int(m.Disp.width//2 + rotated_x)
-        draw_y = int(m.Disp.height//2 + rotated_y)
-        
-        return draw_x, draw_y

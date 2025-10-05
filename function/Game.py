@@ -1,6 +1,5 @@
 import pygame
 import math
-from function.GameStateSync import GameStateSync
 
 class PieseMove:
         
@@ -157,21 +156,8 @@ class Game:
     def __init__(self,m):
         
         self.PM = PieseMove(m)
-        self.sync = GameStateSync()
-        
-        # Пытаемся загрузить состояние из файла (если есть)
-        saved_state = self.sync.load_state()
-        if saved_state and saved_state.get('mode') == '3d':
-            # Если есть сохранённое состояние из 3D режима, загружаем его
-            print("Loading game state from 3D mode...")
-            self.cells = [
-                [{"value":"empty" } for _ in range(8)]
-                for _ in range(8)
-            ]
-            self.sync.apply_state_to_2d(self, saved_state)
-        else:
-            # Иначе стандартная начальная позиция
-            self.cells = [
+
+        self.cells = [
             [{"value":"white_rook" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_rook" }],
             [{"value":"white_knight" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_knight" }],
             [{"value":"white_bishop" },{"value":"white_pawn" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"empty" },{"value":"black_pawn" },{"value":"black_bishop" }],
@@ -544,9 +530,6 @@ class Game:
                     amp = max(4, int(2 * m.config['zoom']))
                 m.Disp.Game.start_shake(120, amp)
             self.selected_cell = None
-            
-            # Сохраняем состояние для синхронизации с 3D режимом
-            self.sync.save_state_from_2d(self)
             
             # Отправляем ход по сети в мультиплеере
             if self.multiplayer_mode and hasattr(m, 'NetworkManager') and m.NetworkManager.is_connected:
