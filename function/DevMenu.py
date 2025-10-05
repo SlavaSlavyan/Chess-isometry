@@ -29,6 +29,7 @@ class DevMenu:
                 {'type': 'checkbox', 'name': 'Fly Mode (Ignore Rules)', 'var': 'fly_mode', 'value': False},
             ],
             'Cards': [
+                {'type': 'button', 'name': 'Open Card Gallery', 'action': 'open_card_gallery'},
                 {'type': 'button', 'name': 'Give Random Card (White)', 'action': 'give_card_white'},
                 {'type': 'button', 'name': 'Give Random Card (Black)', 'action': 'give_card_black'},
                 {'type': 'button', 'name': 'Give All Cards (Both)', 'action': 'give_all_cards'},
@@ -51,6 +52,8 @@ class DevMenu:
                 {'type': 'checkbox', 'name': 'FPS Counter', 'var': 'fps_counter', 'value': False},
                 {'type': 'checkbox', 'name': 'Performance Monitor', 'var': 'perf_monitor', 'value': False},
                 {'type': 'slider', 'name': 'Target FPS', 'var': 'target_fps', 'min': 30, 'max': 240, 'value': 60},
+                {'type': 'dropdown', 'name': 'Engine', 'var': 'engine', 'items': ['pygame', 'panda3d'], 'value': 'pygame'},
+                {'type': 'button', 'name': 'Apply Engine (restart)', 'action': 'apply_engine'},
                 {'type': 'button', 'name': 'Reload Cards Module', 'action': 'reload_cards'},
                 {'type': 'button', 'name': 'Force GC Collect', 'action': 'force_gc'},
                 {'type': 'button', 'name': 'Print Game State', 'action': 'print_state'},
@@ -87,8 +90,14 @@ class DevMenu:
         self.hover_option = None
         self.dragging_slider = None  # {'category': str, 'option_idx': int}
         
+        # Card Gallery
+        self.card_gallery_open = False
+        self.gallery_scroll = 0
+        self.hovered_gallery_card = None
+        
         # Анимации
         self.pulse = 0
+        self.glow_pulse = 0
         
         # Статистика
         self.start_time = time.time()
@@ -119,6 +128,7 @@ class DevMenu:
             self.alpha = max(self.alpha - self.animation_speed, self.target_alpha)
         
         self.pulse += 0.05
+        self.glow_pulse += 0.1
         
         # Обновляем FPS счетчик
         if self.option_states.get('fps_counter'):
@@ -129,6 +139,11 @@ class DevMenu:
     def handle_input(self, m, event):
         """Обработка ввода"""
         if not self.active:
+            return
+        
+        # Если открыта галерея карт, обрабатываем её отдельно
+        if self.card_gallery_open:
+            self._handle_gallery_input(m, event)
             return
         
         if event.type == pygame.KEYDOWN:
@@ -202,6 +217,14 @@ class DevMenu:
         except:
             print(f"[CFG] [DEV MENU] Action: {action}")
         
+        if action == 'apply_engine':
+            selected = self.option_states.get('engine', 'pygame')
+            m.config['engine'] = selected
+            m.JsonManager.save('data\\config', m.config)
+            print(f"🔁 Switching engine to: {selected}. Restarting...")
+            setattr(m, 'request_restart', True)
+            return
+
         if action == 'win_white':
             m.PI.Game.game_over = True
             m.PI.Game.winner = 'white'
@@ -234,6 +257,11 @@ class DevMenu:
         elif action == 'clear_cards_black':
             if hasattr(m, 'CardSystem'):
                 m.CardSystem.player_decks['black'] = []
+        
+        # Открытие галереи карт
+        elif action == 'open_card_gallery':
+            self.card_gallery_open = not self.card_gallery_open
+        
         elif action == 'shake_test':
             if hasattr(m.Disp, 'Game'):
                 m.Disp.Game.start_shake(200, 15)
@@ -286,6 +314,264 @@ class DevMenu:
                         print("🔄 [Discord RPC] Переподключено")
                     except:
                         print("[>>] [Discord RPC] Переподключено")
+    
+    def _give_specific_card(self, m, card_class_name):
+        """Выдаёт конкретную карту текущему игроку"""
+        if not hasattr(m, 'CardSystem'):
+            return
+        
+        # Определяем текущего игрока
+        if hasattr(m.PI, 'Game') and hasattr(m.PI.Game, 'current_player'):
+            player = m.PI.Game.current_player
+        else:
+            player = 'white'  # По умолчанию
+        
+        # Ищем карту по имени класса в словаре available_cards
+        # available_cards это словарь {имя_класса: класс_карты}
+        card_class = None
+        for class_name, cls in m.CardSystem.available_cards.items():
+            if class_name == card_class_name:
+                card_class = cls
+                break
+        
+        if card_class:
+            # Создаём экземпляр карты
+            card_instance = card_class()
+            
+            # Добавляем карту в колоду игрока
+            if player not in m.CardSystem.player_decks:
+                m.CardSystem.player_decks[player] = []
+            
+            m.CardSystem.player_decks[player].append(card_instance)
+            try:
+                print(f"🎴 {player} получил карту: {card_instance.name}")
+            except:
+                print(f"[CARD] {player} получил карту: {card_instance.name}")
+        else:
+            try:
+                print(f"❌ Карта {card_class_name} не найдена")
+            except:
+                print(f"[X] Карта {card_class_name} не найдена")
+    
+    def _handle_gallery_input(self, m, event):
+        """Обработка ввода в галерее карт"""
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            self.card_gallery_open = False
+            return
+        
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Проверяем клик по картам
+            if self.hovered_gallery_card is not None:
+                # Выдаём карту текущему игроку
+                self._give_specific_card(m, self.hovered_gallery_card)
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 4:  # Колесико вверх
+                self.gallery_scroll = max(0, self.gallery_scroll - 30)
+            elif event.button == 5:  # Колесико вниз
+                self.gallery_scroll += 30
+    
+    def _draw_card_gallery(self, m):
+        """Рисует галерею карт"""
+        screen = m.Disp.screen
+        W, H = m.Disp.width, m.Disp.height
+        
+        # Затемнённый фон
+        overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, int(150 * (self.alpha / 255))))
+        screen.blit(overlay, (0, 0))
+        
+        # Главное окно галереи (больше чем обычное меню)
+        gallery_width = min(1000, W - 100)
+        gallery_height = min(700, H - 100)
+        gallery_x = (W - gallery_width) // 2
+        gallery_y = (H - gallery_height) // 2
+        
+        # Градиентный фон с эффектом глубины
+        gallery_surface = pygame.Surface((gallery_width, gallery_height), pygame.SRCALPHA)
+        
+        menu_alpha = self.option_states.get('menu_alpha', 220)
+        
+        for i in range(gallery_height):
+            progress = i / gallery_height
+            alpha = int(menu_alpha * (self.alpha / 255))
+            # Тёмно-синий градиент как в игре
+            color = (
+                int(10 + progress * 15),
+                int(15 + progress * 20),
+                int(30 + progress * 30),
+                alpha
+            )
+            pygame.draw.line(gallery_surface, color, (0, i), (gallery_width, i))
+        
+        # Пульсирующая рамка
+        import math
+        pulse_color = int(abs(math.sin(self.glow_pulse)) * 80 + 120)
+        for thickness in range(3):
+            pygame.draw.rect(gallery_surface, 
+                           (pulse_color, pulse_color + 30, 255, self.alpha), 
+                           (thickness, thickness, gallery_width - thickness*2, gallery_height - thickness*2), 
+                           1, border_radius=15)
+        
+        screen.blit(gallery_surface, (gallery_x, gallery_y))
+        
+        # Заголовок
+        import sys, os
+        def get_font(size):
+            path = 'data/font/title.ttf' if os.path.exists('data/font/title.ttf') else None
+            return pygame.font.Font(path, size) if path else pygame.font.Font(None, size)
+        
+        title_font = get_font(48)
+        small_font = get_font(18)
+        
+        # Заголовок с эффектом свечения
+        title_text = "CARD GALLERY"
+        title_color = (100 + int(abs(math.sin(self.glow_pulse)) * 50), 200, 255)
+        
+        # Тень заголовка
+        title_shadow = title_font.render(title_text, True, (0, 0, 50))
+        screen.blit(title_shadow, (gallery_x + gallery_width//2 - title_shadow.get_width()//2 + 3, gallery_y + 23))
+        
+        title_surf = title_font.render(title_text, True, title_color)
+        screen.blit(title_surf, (gallery_x + gallery_width//2 - title_surf.get_width()//2, gallery_y + 20))
+        
+        # Подзаголовок
+        subtitle = small_font.render("Click on a card to add it to your inventory", True, (150, 150, 200))
+        screen.blit(subtitle, (gallery_x + gallery_width//2 - subtitle.get_width()//2, gallery_y + 75))
+        
+        # Инструкция по закрытию
+        close_text = small_font.render("Press ESC to close", True, (100, 100, 150))
+        screen.blit(close_text, (gallery_x + gallery_width - close_text.get_width() - 20, gallery_y + 20))
+        
+        # Рисуем карты
+        if hasattr(m, 'CardSystem') and m.CardSystem.available_cards:
+            cards_area_y = gallery_y + 110
+            cards_area_height = gallery_height - 130
+            
+            card_width = 140
+            card_height = 180
+            card_spacing = 20
+            cards_per_row = (gallery_width - 40) // (card_width + card_spacing)
+            
+            mouse_pos = pygame.mouse.get_pos()
+            self.hovered_gallery_card = None
+            
+            card_list = list(m.CardSystem.available_cards.items())
+            row = 0
+            col = 0
+            
+            for card_name, card_class in card_list:
+                # Создаём временный экземпляр для получения информации
+                try:
+                    temp_card = card_class()
+                    card_info = temp_card.get_info()
+                    
+                    # Позиция карты
+                    x = gallery_x + 20 + col * (card_width + card_spacing)
+                    y = cards_area_y + row * (card_height + card_spacing) - self.gallery_scroll
+                    
+                    # Пропускаем если вне видимой области
+                    if y + card_height < cards_area_y or y > cards_area_y + cards_area_height:
+                        col += 1
+                        if col >= cards_per_row:
+                            col = 0
+                            row += 1
+                        continue
+                    
+                    # Проверяем hover
+                    card_rect = pygame.Rect(x, y, card_width, card_height)
+                    is_hovered = card_rect.collidepoint(mouse_pos) and cards_area_y < mouse_pos[1] < cards_area_y + cards_area_height
+                    
+                    if is_hovered:
+                        self.hovered_gallery_card = card_name
+                    
+                    # Рисуем карту (используем стиль из CardUI)
+                    self._draw_gallery_card(screen, x, y, card_width, card_height, card_info, is_hovered)
+                    
+                    col += 1
+                    if col >= cards_per_row:
+                        col = 0
+                        row += 1
+                        
+                except Exception as e:
+                    print(f"Ошибка отрисовки карты {card_name}: {e}")
+                    col += 1
+                    if col >= cards_per_row:
+                        col = 0
+                        row += 1
+    
+    def _draw_gallery_card(self, screen, x, y, w, h, card_info, is_hovered):
+        """Рисует одну карту в галерее (в стиле CardUI)"""
+        # Эффект при наведении
+        if is_hovered:
+            w = int(w * 1.05)
+            h = int(h * 1.05)
+            x -= int(w * 0.025)
+            y -= int(h * 0.025)
+        
+        # Создаём поверхность карты
+        card_surface = pygame.Surface((w, h), pygame.SRCALPHA)
+        
+        # Фон карты с градиентом
+        for i in range(h):
+            progress = i / h
+            alpha = 220 if not is_hovered else 255
+            color = (
+                int(20 + progress * 10),
+                int(25 + progress * 15),
+                int(40 + progress * 20),
+                alpha
+            )
+            pygame.draw.line(card_surface, color, (0, i), (w, i))
+        
+        # Рамка карты (цвет зависит от редкости)
+        rarity_colors = {
+            'common': (120, 120, 120),
+            'rare': (100, 150, 255),
+            'epic': (200, 100, 255),
+            'legendary': (255, 200, 50)
+        }
+        
+        border_color = rarity_colors.get(card_info.get('rarity', 'common'), (120, 120, 120))
+        
+        if is_hovered:
+            # Пульсирующая рамка при наведении
+            import math
+            pulse = int(abs(math.sin(self.glow_pulse)) * 50)
+            border_color = tuple(min(255, c + pulse) for c in border_color)
+        
+        for thickness in range(3):
+            pygame.draw.rect(card_surface, border_color,
+                           (thickness, thickness, w - thickness*2, h - thickness*2),
+                           1, border_radius=8)
+        
+        # Иконка карты
+        icon = card_info.get('icon', '?')
+        icon_font = pygame.font.Font(None, 48)
+        icon_surf = icon_font.render(icon, True, card_info.get('color', (255, 255, 255)))
+        icon_rect = icon_surf.get_rect(center=(w//2, h//3))
+        card_surface.blit(icon_surf, icon_rect)
+        
+        # Название карты
+        name_font = pygame.font.Font(None, 20)
+        name_surf = name_font.render(card_info.get('name', 'Card'), True, (255, 255, 255))
+        name_rect = name_surf.get_rect(center=(w//2, h//2 + 10))
+        card_surface.blit(name_surf, name_rect)
+        
+        # Редкость
+        rarity_font = pygame.font.Font(None, 16)
+        rarity_text = card_info.get('rarity', 'common').upper()
+        rarity_surf = rarity_font.render(rarity_text, True, border_color)
+        rarity_rect = rarity_surf.get_rect(center=(w//2, h - 20))
+        card_surface.blit(rarity_surf, rarity_rect)
+        
+        # Эффект свечения при наведении
+        if is_hovered:
+            glow_surface = pygame.Surface((w + 10, h + 10), pygame.SRCALPHA)
+            pygame.draw.rect(glow_surface, (*border_color, 50), (0, 0, w + 10, h + 10), border_radius=10)
+            screen.blit(glow_surface, (x - 5, y - 5))
+        
+        screen.blit(card_surface, (x, y))
     
     def _handle_slider_drag(self, m, mouse_pos):
         """Обработка перетаскивания слайдера"""
@@ -343,6 +629,11 @@ class DevMenu:
     def draw(self, m):
         """Отрисовка меню"""
         if self.alpha <= 0:
+            return
+        
+        # Если открыта галерея карт, рисуем её вместо главного меню
+        if self.card_gallery_open:
+            self._draw_card_gallery(m)
             return
         
         screen = m.Disp.screen
@@ -488,6 +779,8 @@ class DevMenu:
             self._draw_slider(screen, x + width - 200, y + 8, 180, option)
         elif option['type'] == 'button':
             self._draw_button(screen, x + width - 100, y + 5, 90, option, is_hover)
+        elif option['type'] == 'dropdown':
+            self._draw_dropdown(screen, x + width - 200, y + 5, 180, option)
     
     def _draw_checkbox(self, screen, x, y, option):
         """Отрисовка чекбокса"""
@@ -541,6 +834,29 @@ class DevMenu:
         btn_text = small_font.render("Execute", True, (255, 255, 255))
         text_rect = btn_text.get_rect(center=(x + width // 2, y + 12))
         screen.blit(btn_text, text_rect)
+
+    def _draw_dropdown(self, screen, x, y, width, option):
+        """Отрисовка простого дропдауна (без выпадающего списка, клик по области циклично переключает)"""
+        value = self.option_states.get(option['var'], option.get('value'))
+        items = option.get('items', [])
+        rect = pygame.Rect(x, y, width, 25)
+        pygame.draw.rect(screen, (40, 40, 60), rect, border_radius=5)
+        pygame.draw.rect(screen, (150, 150, 150), rect, 2, border_radius=5)
+        small_font = pygame.font.Font(None, 16)
+        text = small_font.render(str(value), True, (255, 255, 255))
+        text_rect = text.get_rect(center=(x + width // 2, y + 12))
+        screen.blit(text, text_rect)
+        # Обработка клика по дропдауну
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()[0]
+        if mouse_pressed and rect.collidepoint(mouse_pos):
+            if items:
+                try:
+                    idx = items.index(value)
+                except ValueError:
+                    idx = -1
+                idx = (idx + 1) % len(items)
+                self.option_states[option['var']] = items[idx]
     
     def _draw_fps_counter(self, screen, W, H):
         """FPS счетчик"""

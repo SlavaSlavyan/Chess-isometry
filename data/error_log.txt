@@ -212,3 +212,711 @@ Traceback (most recent call last):
                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'Multiplayer' object has no attribute 'connected'
 ================================================================================
+
+================================================================================
+[2025-10-03 18:45:03]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:04]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:05]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:05]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:05]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:05]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:05]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:06]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-03 18:45:07]
+Тип: NameError
+Сообщение: name 'font_small' is not defined
+Файл: DevMenu.py
+Строка: 391
+Функция: draw
+Код: fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 389, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 177, in start
+    self.DevMenu.draw(self)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 391, in draw
+    fps_surf = font_small.render(fps_text, True, (100, 255, 100))
+               ^^^^^^^^^^
+NameError: name 'font_small' is not defined
+================================================================================
+
+================================================================================
+[2025-10-05 14:24:28]
+Тип: AttributeError
+Сообщение: 'Game' object has no attribute 'restart'
+Файл: DevMenu.py
+Строка: 214
+Функция: _execute_action
+Код: m.PI.Game.restart(m)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 87, in start
+    self.DevMenu.handle_input(self, event)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 145, in handle_input
+    self._handle_click(m, pygame.mouse.get_pos())
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 181, in _handle_click
+    self._execute_action(m, option['action'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 214, in _execute_action
+    m.PI.Game.restart(m)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Game' object has no attribute 'restart'
+================================================================================
+
+================================================================================
+[2025-10-05 14:28:19]
+Тип: AttributeError
+Сообщение: 'str' object has no attribute '__name__'
+Файл: DevMenu.py
+Строка: 323
+Функция: _give_specific_card
+Код: if card_class:
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 170, in start
+    self.PI.main(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\PlayerInput.py", line 33, in main
+    m.DevMenu.handle_input(m, event)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 151, in handle_input
+    self._handle_click(m, pygame.mouse.get_pos())
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 187, in _handle_click
+    self._execute_action(m, option['action'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 248, in _execute_action
+    self._give_specific_card(m, 'FogOfWar')
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 323, in _give_specific_card
+    if card_class:
+           ^^^^^^^
+AttributeError: 'str' object has no attribute '__name__'. Did you mean: '__ne__'?
+================================================================================
+
+================================================================================
+[2025-10-05 14:28:23]
+Тип: AttributeError
+Сообщение: 'str' object has no attribute '__name__'
+Файл: DevMenu.py
+Строка: 323
+Функция: _give_specific_card
+Код: if card_class:
+
+Полный traceback:
+Traceback (most recent call last):
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 170, in start
+    self.PI.main(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\PlayerInput.py", line 33, in main
+    m.DevMenu.handle_input(m, event)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 151, in handle_input
+    self._handle_click(m, pygame.mouse.get_pos())
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 187, in _handle_click
+    self._execute_action(m, option['action'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 252, in _execute_action
+    self._give_specific_card(m, 'KnightSwap')
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 323, in _give_specific_card
+    if card_class:
+           ^^^^^^^
+AttributeError: 'str' object has no attribute '__name__'. Did you mean: '__ne__'?
+================================================================================
+
+================================================================================
+[2025-10-05 14:59:41]
+Тип: AttributeError
+Сообщение: 'Game' object has no attribute 'restart'
+Файл: DevMenu.py
+Строка: 229
+Функция: _execute_action
+Код: m.PI.Game.restart(m)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 170, in start
+    self.PI.main(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\PlayerInput.py", line 33, in main
+    m.DevMenu.handle_input(m, event)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 160, in handle_input
+    self._handle_click(m, pygame.mouse.get_pos())
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 196, in _handle_click
+    self._execute_action(m, option['action'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 229, in _execute_action
+    m.PI.Game.restart(m)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Game' object has no attribute 'restart'
+================================================================================
+
+================================================================================
+[2025-10-05 16:19:41]
+Тип: AttributeError
+Сообщение: 'Game' object has no attribute 'restart'
+Файл: DevMenu.py
+Строка: 237
+Функция: _execute_action
+Код: m.PI.Game.restart(m)
+
+Полный traceback:
+Traceback (most recent call last):
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\main.py", line 173, in start
+    self.PI.main(self)
+    ~~~~~~~~~~~~^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\PlayerInput.py", line 33, in main
+    m.DevMenu.handle_input(m, event)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 160, in handle_input
+    self._handle_click(m, pygame.mouse.get_pos())
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 196, in _handle_click
+    self._execute_action(m, option['action'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\heck43\Documents\GitHub\Chess-isometry\function\DevMenu.py", line 237, in _execute_action
+    m.PI.Game.restart(m)
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'Game' object has no attribute 'restart'
+================================================================================
