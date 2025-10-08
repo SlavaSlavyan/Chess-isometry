@@ -1,0 +1,40 @@
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+
+def draw():
+    # Очищаем экран
+    glClear(GL_COLOR_BUFFER_BIT)
+    
+    # Рисуем треугольник
+    glBegin(GL_TRIANGLES)
+    glColor3f(1.0, 0.0, 0.0)  # Красный
+    glVertex2f(0.0, 0.5)
+    glColor3f(0.0, 1.0, 0.0)  # Зеленый
+    glVertex2f(-0.5, -0.5)
+    glColor3f(0.0, 0.0, 1.0)  # Синий
+    glVertex2f(0.5, -0.5)
+    glEnd()
+    
+    # Обновляем экран
+    glutSwapBuffers()
+
+def main():
+    # Инициализация GLUT
+    glutInit()
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
+    glutInitWindowSize(500, 500)
+    glutInitWindowPosition(100, 100)
+    glutCreateWindow(b"Simple OpenGL Program")
+    
+    # Устанавливаем функцию отрисовки
+    glutDisplayFunc(draw)
+    
+    # Задаем цвет очистки экрана
+    glClearColor(0.0, 0.0, 0.0, 1.0)  # Черный фон
+    
+    # Главный цикл GLUT
+    glutMainLoop()
+
+if __name__ == "__main__":
+    main()
