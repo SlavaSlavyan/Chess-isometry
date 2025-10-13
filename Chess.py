@@ -1,36 +1,37 @@
-VERSION = "2.0.2 DEV"
+VERSION = "2.0.3 DEV"
 # Файл запуска
+import time
 
-error_log = []
+from multiprocessing import Process, Manager
 
-try:
-    from multiprocessing import Process
-    from pathlib import Path
+from src.Main import Main
+from src.SimpleDisplay import SimpleDisplay
     
-except: 
-    start_allow = False
-    error_log.append("P0")
-    # Если библиотеки python не удаётся загрузить, программа не даст разрешение на запуск.
-
-# Импорт ГЛАВНОГО класса программы.
-try:
-    from src.Main import Main
-    start_allow = True
-except: 
-    error_log.append("M0")
-    start_allow = False 
-    # Если главный модуль не удаётся загрузить, программа не даст разрешение на запуск.
-
-
-if start_allow:
-    
-    class ChessStart:
+class ChessStart:
         
-        def __init__(self):
+    def __init__(self):
             
-            self.Chess = Main() # Экземпляр основного класса.
+        self.SplDisp = SimpleDisplay()
         
-        def main(self):
+    def main(self):
 
-            # Основной цикл.
-            self.Chess.start()
+        with Manager() as manager:
+
+            LoadingScreen = Process(target=self.SplDisp.loading_screen)
+            LoadingScreen.start()
+
+            self.Chess = Main()
+
+            if LoadingScreen.is_alive():
+
+                print(1)
+                LoadingScreen.terminate()
+                self.Chess.start()
+            
+            else:
+                print('err')
+
+if __name__ == "__main__":
+
+    SLL = ChessStart()
+    SLL.main()
