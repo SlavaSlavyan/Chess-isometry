@@ -1,4 +1,4 @@
-Программа использует python 3.13.7
+Программа использует python 3.14.0
 
 Визуал создан с помощью OpenGL
 
@@ -6,4 +6,4 @@
 
 PyOpenGL
 PyOpenGL_accelerate
-numpy
+#numpy

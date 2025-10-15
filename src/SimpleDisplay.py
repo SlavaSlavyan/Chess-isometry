@@ -1,3 +1,4 @@
+import sys
 import turtle
 
 class SimpleDisplay:
@@ -5,23 +6,42 @@ class SimpleDisplay:
     def __init__(self):
 
         turtle.Screen().setup(1200,800)
-        turtle.Screen().title("Starting")
+        turtle.Screen().title("Simple display")
         turtle.bgcolor((0,0,0))
+        turtle.fillcolor((0,0,0))
         turtle.pencolor((1,1,1))
         turtle.hideturtle()
         turtle.tracer(0)
-        turtle.up()
+    
+    def read_log(self, path: str) -> str:
+        with open(path,"r",encoding='utf-8') as file:
+            return file.read()
 
     def loading_screen(self):
 
-        count = 0
-
-        SimpleDisplay.start_settings()
+        tick = 0
 
         while True:
+            
+            log = self.read_log('data\\logs\\_last.log')
 
             turtle.clear()
-            turtle.write(f"Loading... {count}",False,'center',("Courier",30,"normal"))
+            
+            turtle.teleport(-200,25)
+            
+            turtle.begin_fill()
+            turtle.goto(200,25)
+            turtle.goto(200,-25)
+            turtle.goto(-200,-25)
+            turtle.goto(-200,25)
+            turtle.end_fill()
+            
+            turtle.teleport(0,-25)
+            turtle.write(f"LOADING",False,'center',("Courier",30,"normal"))
+            
             turtle.update()
 
-            count += 1
+            tick += 1
+
+Display = SimpleDisplay()
+getattr(Display, sys.argv[1])()

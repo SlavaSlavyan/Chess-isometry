@@ -12,4 +12,4 @@ class Main:
         pass
     
     def start(self):
-        pass
+        print(1)
