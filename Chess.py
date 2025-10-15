@@ -1,9 +1,10 @@
-VERSION = "2.0.4 DEV"
+VERSION = "2.1.0 DEV"
 # Launch file
 
 import datetime
 import subprocess
 import sys
+import time
 
 def crash_log(text: str):
     with open(f"Error {datetime.datetime.now().strftime('%Y.%m.%d %H-%M-%S')}.log","a",encoding='utf-8') as file:
@@ -31,6 +32,7 @@ try:
     StartLog.write(f"Launching the loading screen.")
     loading_screen = subprocess.Popen([sys.executable,"src\\SimpleDisplay.py","loading_screen"])
     loading_screen_allow = True
+    time.sleep(1)
     
 except Exception as err:
     crash_log(f"Сan't display the loading screen.\n{err}")
@@ -43,7 +45,8 @@ try:
 
 except Exception as err:
     crash_log(f"Сan not load the main module.\n{err}\n\nThe program will not start.")
-import time
+    run = True
+
 class ChessStart:
     
     def __init__(self):
@@ -51,12 +54,9 @@ class ChessStart:
     
     def main(self):
         
-        StartLog.write(f"Initialization of the main program class.")
-        
         self.Chess = Main({
             "LogClass":StartLog
         })
-        time.sleep(5)
         
         if loading_screen_allow:
             
