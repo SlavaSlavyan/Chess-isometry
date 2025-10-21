@@ -18,7 +18,7 @@ def crash_log(text: str, error_id: int = "Unexpected") -> str:
         Returns a **formatted error string** if it needs to be sent elsewhere.
     '''
     
-    error_text = f"Error #{error_id} {datetime.datetime.now().strftime('%H:%M:%S')}\n\n{text}\n\n{traceback.format_exc()}" + "-"*50
+    error_text = f"Error #{error_id} {datetime.datetime.now().strftime('%H:%M:%S')}\n\n{text}\n\n{traceback.format_exc()}" + "-"*50 + "\n"
     
     with open(f"Crash report {datetime.datetime.now().strftime('%Y.%m.%d %H-%M-%S')}.log","a",encoding='utf-8') as file:
         file.write(error_text)
@@ -64,9 +64,6 @@ try:
                                       stderr=subprocess.PIPE,
                                       text=True)
     
-    # A little delay just to be sure everything is ok
-    time.sleep(1) 
-    
     if loading_screen.poll() == None:
         loading_screen_allow = True
         
@@ -77,10 +74,39 @@ try:
     
 except Exception as err:
     
-    StartLog.write("Сan't display the loading screen.","error")
-    crash_log(f"Сan't display the loading screen.\nPython:{err}")
+    error_info = f"Сan't display the loading screen.\nPython:{err}"
+    StartLog.write(error_info,"error")
+    crash_log(error_info)
     
     loading_screen_allow = False
+
+# --------------------------------------------------------------------------------------------------------------------------------- #
+
+# function for opening simple windows
+
+def new_simple_display(screen: str):
+    try:
+        
+        StartLog.write(f"Launching the loading screen.")
+        loading_screen = subprocess.Popen([sys.executable,"src\\SimpleDisplay.py","loading_screen"],
+                                        stderr=subprocess.PIPE,
+                                        text=True)
+        
+        if loading_screen.poll() == None:
+            loading_screen_allow = True
+            
+        else:
+            # Loading_screen.communicate()[1] will communicate 
+            # the error that was inside loading_screen
+            raise ValueError(loading_screen.communicate()[1])
+        
+    except Exception as err:
+        
+        error_info = f"Сan't display the loading screen.\nPython:{err}"
+        StartLog.write(error_info,"error")
+        crash_log(error_info)
+        
+        loading_screen_allow = False
 
 # --------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -94,7 +120,9 @@ try:
 
 except Exception as err:
     
-    crash_log(f"Сan not load the main module.\nPython:{err}\nThe program will not start.")
+    error_info = f"Сan not load the main module.\nPython:{err}\nThe program will not start."
+    StartLog.write(error_info,"warning")
+    crash_log(error_info)
     
     run = False
     
@@ -127,7 +155,9 @@ class ChessStart:
             
         except Exception as err:
             
-            crash_log(f"Error in initialization of main class\n{err}\n\nThe program will not start.\n\n{traceback.format_exc()}")
+            error_info = f"Error in initialization of main class\n{err}\n\nThe program will not start."
+            StartLog.write(error_info,"warning")
+            crash_log(error_info)
             if loading_screen_allow: loading_screen.terminate()
             
             return False
@@ -136,12 +166,16 @@ class ChessStart:
         
         if loading_screen_allow:
             
+            # There's a slight delay to ensure 
+            # the loading screen appears
+            time.sleep(1)
+            
             if loading_screen.poll() == None:
                 loading_screen.terminate()
                 self.Chess.start()
             
             else:
-                self.Chess.Log.write("The user interrupted the boot cycle. The program will not start.")
+                self.Chess.Log.write("The user interrupted the boot cycle. The program will not start.","info")
             
         else:
 
