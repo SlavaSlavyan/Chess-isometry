@@ -479,6 +479,24 @@ class Game:
             # Создаем эффект распада съеденной фигуры
             m.Disp.Game.create_destruction_effect(m, (to_x, to_y), captured_piece)
             
+            # Визуальные эффекты при взятии фигуры
+            if hasattr(m, 'VisualEffects'):
+                # Конвертируем позицию на доске в экранные координаты
+                screen_x = m.Disp.width // 2 + (to_x - 3.5) * 80
+                screen_y = m.Disp.height // 2 + (to_y - 3.5) * 80
+                
+                # Цвет частиц зависит от команды
+                particle_color = (255, 200, 200) if 'white' in captured_piece else (100, 100, 100)
+                
+                # Создаем взрыв частиц
+                m.VisualEffects.create_explosion_particles(screen_x, screen_y, count=15, color=particle_color)
+                
+                # Тряска экрана (сильнее для важных фигур)
+                if 'queen' in captured_piece or 'king' in captured_piece:
+                    m.VisualEffects.trigger_screen_shake(intensity=12, duration=400)
+                else:
+                    m.VisualEffects.trigger_screen_shake(intensity=6, duration=250)
+            
             # Проверяем, съедается ли король
             if captured_piece.endswith('_king'):
                 # Игра окончена - король съеден!
@@ -486,6 +504,13 @@ class Game:
                 self.game_over = True
                 self.winner = winner
                 print(f"🎉 ИГРА ОКОНЧЕНА! {winner.upper()} ПОБЕДИЛ!")
+                
+                # Мощный эффект при победе
+                if hasattr(m, 'VisualEffects'):
+                    screen_x = m.Disp.width // 2 + (to_x - 3.5) * 80
+                    screen_y = m.Disp.height // 2 + (to_y - 3.5) * 80
+                    m.VisualEffects.create_explosion_particles(screen_x, screen_y, count=50, color=(255, 215, 0))
+                    m.VisualEffects.trigger_screen_shake(intensity=20, duration=800)
         
         # Перемещаем фигуру
         piece = self.cells[from_x][from_y]['value']

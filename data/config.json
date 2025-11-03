@@ -5,8 +5,8 @@
         800
     ],
     "them": "base",
-    "zoom": 1.1,
-    "f3": true,
+    "zoom": 1.9,
+    "f3": false,
     "bg_mode": "2d",
     "music_volume": 0.285,
     "sfx_volume": 0.83

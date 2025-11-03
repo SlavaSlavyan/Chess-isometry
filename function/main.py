@@ -8,6 +8,7 @@ from function.SplashManager import SplashManager
 from function.CardSystem import CardSystem
 from function.DevMenu import DevMenu
 from function.DiscordRPC import DiscordRPC
+from function.VisualEffects import VisualEffects
 from display.main import Display
 from display.CardUI import CardUI
 from function.PlayerInput import PlayerInput
@@ -33,6 +34,7 @@ class Main:
         self.DiscordRPC = DiscordRPC()
         
         self.Disp = Display(self)
+        self.VisualEffects = VisualEffects(self)
         self.CardUI = CardUI(self)
         self.PI = PlayerInput(self)
         self.Menu = Menu(self)
@@ -173,8 +175,29 @@ class Main:
                 # Обновляем музыку (проверяем окончание треков)
                 self.AudioManager.update()
                 
+                # Обновляем частицы
+                dt = self.clock.get_time()
+                self.VisualEffects.update_particles(dt)
+                
+                # Рисуем частицы
+                self.VisualEffects.draw_particles(self.Disp.screen)
+                
                 # Рисуем dev menu поверх всего
                 self.DevMenu.draw(self)
+                
+                # Применяем визуальные эффекты (пост-процессинг)
+                processed_screen = self.VisualEffects.apply_effects(self.Disp.screen)
+                
+                # Применяем screen shake
+                shake_offset = self.VisualEffects.get_screen_shake_offset()
+                if shake_offset != (0, 0):
+                    # Временный экран с offset
+                    temp = pygame.Surface((self.Disp.width, self.Disp.height))
+                    temp.fill((0, 0, 0))
+                    temp.blit(processed_screen, shake_offset)
+                    self.Disp.screen.blit(temp, (0, 0))
+                else:
+                    self.Disp.screen.blit(processed_screen, (0, 0))
                 
                 pygame.display.flip()
                 

@@ -14,7 +14,7 @@ class DevMenu:
         self.animation_speed = 15
         
         # Категории
-        self.categories = ['Game', 'Cards', 'Visual', 'System', 'Menu', 'Misc']
+        self.categories = ['Game', 'Cards', 'Visual', 'FX', 'System', 'Menu', 'Misc']
         self.current_category = 0
         
         # Опции для каждой категории
@@ -45,8 +45,24 @@ class DevMenu:
                 {'type': 'checkbox', 'name': 'Show Grid', 'var': 'show_grid', 'value': False},
                 {'type': 'checkbox', 'name': 'Show Coordinates', 'var': 'show_coords', 'value': False},
                 {'type': 'checkbox', 'name': 'Rainbow Mode', 'var': 'rainbow_mode', 'value': False},
-                {'type': 'checkbox', 'name': 'Particle Effects x10', 'var': 'particle_boost', 'value': False},
+            ],
+            'FX': [
+                {'type': 'checkbox', 'name': 'Bloom Glow', 'var': 'fx_bloom', 'value': True},
+                {'type': 'checkbox', 'name': 'Vignette', 'var': 'fx_vignette', 'value': True},
+                {'type': 'checkbox', 'name': 'Chromatic Aberration', 'var': 'fx_chromatic', 'value': False},
+                {'type': 'checkbox', 'name': 'Scanlines (CRT)', 'var': 'fx_scanlines', 'value': False},
+                {'type': 'checkbox', 'name': 'CRT Effect', 'var': 'fx_crt', 'value': False},
+                {'type': 'checkbox', 'name': 'Screen Shake', 'var': 'fx_shake', 'value': True},
+                {'type': 'checkbox', 'name': 'Particles', 'var': 'fx_particles', 'value': True},
+                {'type': 'checkbox', 'name': 'Dynamic Lighting', 'var': 'fx_lighting', 'value': True},
+                {'type': 'checkbox', 'name': 'Color Grading', 'var': 'fx_color_grade', 'value': False},
+                {'type': 'checkbox', 'name': 'Motion Blur', 'var': 'fx_motion_blur', 'value': False},
+                {'type': 'slider', 'name': 'Bloom Intensity', 'var': 'fx_bloom_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.3},
+                {'type': 'slider', 'name': 'Vignette Intensity', 'var': 'fx_vignette_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.4},
+                {'type': 'slider', 'name': 'Color Temperature', 'var': 'fx_color_temp', 'min': -1.0, 'max': 1.0, 'value': 0.0},
                 {'type': 'button', 'name': 'Screen Shake Test', 'action': 'shake_test'},
+                {'type': 'button', 'name': 'Explosion Test', 'action': 'explosion_test'},
+                {'type': 'button', 'name': 'Clear All Particles', 'action': 'clear_particles'},
             ],
             'System': [
                 {'type': 'checkbox', 'name': 'FPS Counter', 'var': 'fps_counter', 'value': False},
@@ -253,8 +269,21 @@ class DevMenu:
             self.card_gallery_open = not self.card_gallery_open
         
         elif action == 'shake_test':
-            if hasattr(m.Disp, 'Game'):
-                m.Disp.Game.start_shake(200, 15)
+            if hasattr(m, 'VisualEffects'):
+                m.VisualEffects.trigger_screen_shake(intensity=15, duration=500)
+                print("📳 Screen shake активирован")
+        elif action == 'explosion_test':
+            if hasattr(m, 'VisualEffects'):
+                # Создаем взрыв в центре экрана
+                center_x = m.Disp.width // 2
+                center_y = m.Disp.height // 2
+                m.VisualEffects.create_explosion_particles(center_x, center_y, count=50)
+                m.VisualEffects.trigger_screen_shake(intensity=8, duration=300)
+                print("💥 Тестовый взрыв создан")
+        elif action == 'clear_particles':
+            if hasattr(m, 'VisualEffects'):
+                m.VisualEffects.particles.clear()
+                print("✨ Частицы очищены")
         elif action == 'reload_cards':
             if hasattr(m, 'CardSystem'):
                 m.CardSystem.reload_cards()
@@ -615,6 +644,36 @@ class DevMenu:
                 m.DiscordRPC.enable()
             else:
                 m.DiscordRPC.disable()
+        
+        # FX опции
+        elif option['var'] == 'fx_bloom' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('bloom', self.option_states[option['var']])
+        elif option['var'] == 'fx_vignette' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('vignette', self.option_states[option['var']])
+        elif option['var'] == 'fx_chromatic' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('chromatic_aberration', self.option_states[option['var']])
+        elif option['var'] == 'fx_scanlines' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('scanlines', self.option_states[option['var']])
+        elif option['var'] == 'fx_crt' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('crt', self.option_states[option['var']])
+        elif option['var'] == 'fx_shake' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('screen_shake', self.option_states[option['var']])
+        elif option['var'] == 'fx_particles' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('particles', self.option_states[option['var']])
+        elif option['var'] == 'fx_lighting' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('lighting', self.option_states[option['var']])
+        elif option['var'] == 'fx_color_grade' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('color_grading', self.option_states[option['var']])
+        elif option['var'] == 'fx_motion_blur' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.toggle_effect('motion_blur', self.option_states[option['var']])
+        
+        # FX параметры
+        elif option['var'] == 'fx_bloom_intensity' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.bloom_intensity = self.option_states[option['var']]
+        elif option['var'] == 'fx_vignette_intensity' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.vignette_intensity = self.option_states[option['var']]
+        elif option['var'] == 'fx_color_temp' and hasattr(m, 'VisualEffects'):
+            m.VisualEffects.color_temperature = self.option_states[option['var']]
     
     def draw(self, m):
         """Отрисовка меню"""
