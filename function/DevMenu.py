@@ -14,7 +14,7 @@ class DevMenu:
         self.animation_speed = 15
         
         # Категории
-        self.categories = ['Game', 'Cards', 'Visual', 'FX', 'System', 'Menu', 'Misc']
+        self.categories = ['Game', 'Cards', 'Visual', 'System', 'Menu', 'Misc']
         self.current_category = 0
         
         # Опции для каждой категории
@@ -40,29 +40,34 @@ class DevMenu:
                 {'type': 'checkbox', 'name': 'Unlimited Card Uses', 'var': 'unlimited_cards', 'value': False},
             ],
             'Visual': [
+                # === SHADERS (Постобработка) ===
+                {'type': 'label', 'name': '=== SHADERS ===' },
+                {'type': 'checkbox', 'name': '🌟 Vignette (Виньетка)', 'var': 'shader_vignette', 'value': True},
+                {'type': 'slider', 'name': 'Vignette Intensity', 'var': 'shader_vignette_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.5},
+                {'type': 'checkbox', 'name': '✨ Bloom (Свечение)', 'var': 'shader_bloom', 'value': False},
+                {'type': 'slider', 'name': 'Bloom Intensity', 'var': 'shader_bloom_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.3},
+                {'type': 'slider', 'name': 'Bloom Threshold', 'var': 'shader_bloom_threshold', 'min': 100, 'max': 255, 'value': 200},
+                {'type': 'checkbox', 'name': '🎨 Color Grading', 'var': 'shader_color_grading', 'value': False},
+                {'type': 'slider', 'name': 'Saturation', 'var': 'shader_saturation', 'min': 0.0, 'max': 2.0, 'value': 1.0},
+                {'type': 'slider', 'name': 'Brightness', 'var': 'shader_brightness', 'min': 0.5, 'max': 1.5, 'value': 1.0},
+                {'type': 'slider', 'name': 'Contrast', 'var': 'shader_contrast', 'min': 0.5, 'max': 1.5, 'value': 1.0},
+                {'type': 'checkbox', 'name': '🌈 Chromatic Aberration', 'var': 'shader_chromatic', 'value': False},
+                {'type': 'slider', 'name': 'Aberration Amount', 'var': 'shader_aberration_amount', 'min': 0.0, 'max': 5.0, 'value': 2.0},
+                {'type': 'checkbox', 'name': '🖥️ CRT Effect', 'var': 'shader_crt', 'value': False},
+                {'type': 'slider', 'name': 'Scanline Intensity', 'var': 'shader_scanline_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.3},
+                {'type': 'checkbox', 'name': '📺 Pixelation', 'var': 'shader_pixelation', 'value': False},
+                {'type': 'slider', 'name': 'Pixel Size', 'var': 'shader_pixel_size', 'min': 1, 'max': 20, 'value': 4},
+                {'type': 'button', 'name': '🧪 Test All Shaders', 'action': 'test_shaders'},
+                {'type': 'button', 'name': '💾 Save Shader Settings', 'action': 'save_shaders'},
+                {'type': 'label', 'name': '=== OTHER ===' },
+                # === Другие визуальные опции ===
                 {'type': 'slider', 'name': 'Animation Speed', 'var': 'anim_speed', 'min': 0.1, 'max': 5.0, 'value': 1.0},
                 {'type': 'slider', 'name': 'Zoom Override', 'var': 'zoom_override', 'min': 0.5, 'max': 5.0, 'value': 1.0},
                 {'type': 'checkbox', 'name': 'Show Grid', 'var': 'show_grid', 'value': False},
                 {'type': 'checkbox', 'name': 'Show Coordinates', 'var': 'show_coords', 'value': False},
                 {'type': 'checkbox', 'name': 'Rainbow Mode', 'var': 'rainbow_mode', 'value': False},
-            ],
-            'FX': [
-                {'type': 'checkbox', 'name': 'Bloom Glow', 'var': 'fx_bloom', 'value': True},
-                {'type': 'checkbox', 'name': 'Vignette', 'var': 'fx_vignette', 'value': True},
-                {'type': 'checkbox', 'name': 'Chromatic Aberration', 'var': 'fx_chromatic', 'value': False},
-                {'type': 'checkbox', 'name': 'Scanlines (CRT)', 'var': 'fx_scanlines', 'value': False},
-                {'type': 'checkbox', 'name': 'CRT Effect', 'var': 'fx_crt', 'value': False},
-                {'type': 'checkbox', 'name': 'Screen Shake', 'var': 'fx_shake', 'value': True},
-                {'type': 'checkbox', 'name': 'Particles', 'var': 'fx_particles', 'value': True},
-                {'type': 'checkbox', 'name': 'Dynamic Lighting', 'var': 'fx_lighting', 'value': True},
-                {'type': 'checkbox', 'name': 'Color Grading', 'var': 'fx_color_grade', 'value': False},
-                {'type': 'checkbox', 'name': 'Motion Blur', 'var': 'fx_motion_blur', 'value': False},
-                {'type': 'slider', 'name': 'Bloom Intensity', 'var': 'fx_bloom_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.3},
-                {'type': 'slider', 'name': 'Vignette Intensity', 'var': 'fx_vignette_intensity', 'min': 0.0, 'max': 1.0, 'value': 0.4},
-                {'type': 'slider', 'name': 'Color Temperature', 'var': 'fx_color_temp', 'min': -1.0, 'max': 1.0, 'value': 0.0},
+                {'type': 'checkbox', 'name': 'Particle Effects x10', 'var': 'particle_boost', 'value': False},
                 {'type': 'button', 'name': 'Screen Shake Test', 'action': 'shake_test'},
-                {'type': 'button', 'name': 'Explosion Test', 'action': 'explosion_test'},
-                {'type': 'button', 'name': 'Clear All Particles', 'action': 'clear_particles'},
             ],
             'System': [
                 {'type': 'checkbox', 'name': 'FPS Counter', 'var': 'fps_counter', 'value': False},
@@ -269,21 +274,8 @@ class DevMenu:
             self.card_gallery_open = not self.card_gallery_open
         
         elif action == 'shake_test':
-            if hasattr(m, 'VisualEffects'):
-                m.VisualEffects.trigger_screen_shake(intensity=15, duration=500)
-                print("📳 Screen shake активирован")
-        elif action == 'explosion_test':
-            if hasattr(m, 'VisualEffects'):
-                # Создаем взрыв в центре экрана
-                center_x = m.Disp.width // 2
-                center_y = m.Disp.height // 2
-                m.VisualEffects.create_explosion_particles(center_x, center_y, count=50)
-                m.VisualEffects.trigger_screen_shake(intensity=8, duration=300)
-                print("💥 Тестовый взрыв создан")
-        elif action == 'clear_particles':
-            if hasattr(m, 'VisualEffects'):
-                m.VisualEffects.particles.clear()
-                print("✨ Частицы очищены")
+            if hasattr(m.Disp, 'Game'):
+                m.Disp.Game.start_shake(200, 15)
         elif action == 'reload_cards':
             if hasattr(m, 'CardSystem'):
                 m.CardSystem.reload_cards()
@@ -333,6 +325,20 @@ class DevMenu:
                         print("🔄 [Discord RPC] Переподключено")
                     except:
                         print("[>>] [Discord RPC] Переподключено")
+        
+        # === SHADER ACTIONS ===
+        elif action == 'test_shaders':
+            if hasattr(m, 'Shaders'):
+                # Захватываем текущий экран для тестирования
+                screen_capture = m.Disp.screen.copy()
+                m.Shaders.test_effects(screen_capture)
+        elif action == 'save_shaders':
+            if hasattr(m, 'save_shader_settings'):
+                m.save_shader_settings()
+                try:
+                    print("💾 [Shaders] Настройки сохранены в config.json")
+                except:
+                    print("[SAVE] [Shaders] Настройки сохранены")
     
     def _give_specific_card(self, m, card_class_name):
         """Выдаёт конкретную карту текущему игроку"""
@@ -645,35 +651,40 @@ class DevMenu:
             else:
                 m.DiscordRPC.disable()
         
-        # FX опции
-        elif option['var'] == 'fx_bloom' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('bloom', self.option_states[option['var']])
-        elif option['var'] == 'fx_vignette' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('vignette', self.option_states[option['var']])
-        elif option['var'] == 'fx_chromatic' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('chromatic_aberration', self.option_states[option['var']])
-        elif option['var'] == 'fx_scanlines' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('scanlines', self.option_states[option['var']])
-        elif option['var'] == 'fx_crt' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('crt', self.option_states[option['var']])
-        elif option['var'] == 'fx_shake' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('screen_shake', self.option_states[option['var']])
-        elif option['var'] == 'fx_particles' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('particles', self.option_states[option['var']])
-        elif option['var'] == 'fx_lighting' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('lighting', self.option_states[option['var']])
-        elif option['var'] == 'fx_color_grade' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('color_grading', self.option_states[option['var']])
-        elif option['var'] == 'fx_motion_blur' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.toggle_effect('motion_blur', self.option_states[option['var']])
-        
-        # FX параметры
-        elif option['var'] == 'fx_bloom_intensity' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.bloom_intensity = self.option_states[option['var']]
-        elif option['var'] == 'fx_vignette_intensity' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.vignette_intensity = self.option_states[option['var']]
-        elif option['var'] == 'fx_color_temp' and hasattr(m, 'VisualEffects'):
-            m.VisualEffects.color_temperature = self.option_states[option['var']]
+        # === SHADER OPTIONS ===
+        elif hasattr(m, 'Shaders'):
+            if option['var'] == 'shader_vignette':
+                m.Shaders.vignette_enabled = self.option_states[option['var']]
+            elif option['var'] == 'shader_vignette_intensity':
+                m.Shaders.vignette_intensity = self.option_states[option['var']]
+                m.Shaders._create_vignette_cache()
+            elif option['var'] == 'shader_bloom':
+                m.Shaders.bloom_enabled = self.option_states[option['var']] and not m.Shaders.performance_mode
+            elif option['var'] == 'shader_bloom_intensity':
+                m.Shaders.bloom_intensity = self.option_states[option['var']]
+            elif option['var'] == 'shader_bloom_threshold':
+                m.Shaders.bloom_threshold = int(self.option_states[option['var']])
+            elif option['var'] == 'shader_color_grading':
+                m.Shaders.color_grading_enabled = self.option_states[option['var']]
+            elif option['var'] == 'shader_saturation':
+                m.Shaders.saturation = self.option_states[option['var']]
+            elif option['var'] == 'shader_brightness':
+                m.Shaders.brightness = self.option_states[option['var']]
+            elif option['var'] == 'shader_contrast':
+                m.Shaders.contrast = self.option_states[option['var']]
+            elif option['var'] == 'shader_chromatic':
+                m.Shaders.chromatic_aberration_enabled = self.option_states[option['var']]
+            elif option['var'] == 'shader_aberration_amount':
+                m.Shaders.aberration_amount = self.option_states[option['var']]
+            elif option['var'] == 'shader_crt':
+                m.Shaders.crt_enabled = self.option_states[option['var']]
+            elif option['var'] == 'shader_scanline_intensity':
+                m.Shaders.scanline_intensity = self.option_states[option['var']]
+                m.Shaders._create_crt_scanlines_cache()
+            elif option['var'] == 'shader_pixelation':
+                m.Shaders.pixelation_enabled = self.option_states[option['var']]
+            elif option['var'] == 'shader_pixel_size':
+                m.Shaders.pixel_size = int(self.option_states[option['var']])
     
     def draw(self, m):
         """Отрисовка меню"""
@@ -822,7 +833,10 @@ class DevMenu:
         screen.blit(name_text, (x + 10, y + 10))
         
         # Элемент управления
-        if option['type'] == 'checkbox':
+        if option['type'] == 'label':
+            # Label - просто заголовок раздела (уже отрисован выше)
+            pass
+        elif option['type'] == 'checkbox':
             self._draw_checkbox(screen, x + width - 40, y + 8, option)
         elif option['type'] == 'slider':
             self._draw_slider(screen, x + width - 200, y + 8, 180, option)

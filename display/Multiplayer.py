@@ -474,9 +474,9 @@ class Multiplayer:
             # Аватар текущего игрока
             avatar = m.PlayerProfile.get_avatar_surface()
             if avatar:
-            avatar_rect = pygame.Rect(x, y_offset, 32, 32)
-            scaled_avatar = pygame.transform.scale(avatar, (32, 32))
-            m.Disp.screen.blit(scaled_avatar, avatar_rect)
+                avatar_rect = pygame.Rect(x, y_offset, 32, 32)
+                scaled_avatar = pygame.transform.scale(avatar, (32, 32))
+                m.Disp.screen.blit(scaled_avatar, avatar_rect)
             
             # Текст с ролью
             role = "(Хост)" if m.Multiplayer.is_host else "(Вы)"

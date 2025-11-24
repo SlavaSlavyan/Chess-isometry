@@ -366,6 +366,24 @@ class Game:
                         
                     if m.PI.Game.cells[x][y]['status'] == 'selected':
                         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['selected_cell'],m.PI.Game.cells[x][y]['points'])
+                        
+                        # === ЭФФЕКТ: Glow на выбранной клетке ===
+                        if hasattr(m, 'Shaders'):
+                            # Находим центр клетки для свечения
+                            cell_points = m.PI.Game.cells[x][y]['points']
+                            if len(cell_points) >= 4:
+                                center_x = sum(p[0] for p in cell_points) / len(cell_points)
+                                center_y = sum(p[1] for p in cell_points) / len(cell_points)
+                                
+                                # Рисуем радиальное свечение
+                                glow_color = (255, 255, 150)  # Жёлтое свечение
+                                glow_intensity = 0.3 + 0.1 * math.sin(self.pulse * 2)  # Пульсация
+                                
+                                for radius in range(60, 10, -10):
+                                    alpha = int(100 * glow_intensity * (1.0 - radius / 60))
+                                    glow_surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+                                    pygame.draw.circle(glow_surf, (*glow_color, alpha), (radius, radius), radius)
+                                    m.Disp.screen.blit(glow_surf, (int(center_x - radius), int(center_y - radius)), special_flags=pygame.BLEND_RGB_ADD)
                     
                     elif m.PI.Game.cells[x][y]['status'] == 'move':
                         pygame.draw.polygon(m.Disp.screen,m.Disp.colors['Game']['move_cell'],m.PI.Game.cells[x][y]['points'])

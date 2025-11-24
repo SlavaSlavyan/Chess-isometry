@@ -8,7 +8,7 @@ from function.SplashManager import SplashManager
 from function.CardSystem import CardSystem
 from function.DevMenu import DevMenu
 from function.DiscordRPC import DiscordRPC
-from function.VisualEffects import VisualEffects
+from function.PyGameShaders import PyGameShaders
 from display.main import Display
 from display.CardUI import CardUI
 from function.PlayerInput import PlayerInput
@@ -34,7 +34,6 @@ class Main:
         self.DiscordRPC = DiscordRPC()
         
         self.Disp = Display(self)
-        self.VisualEffects = VisualEffects(self)
         self.CardUI = CardUI(self)
         self.PI = PlayerInput(self)
         self.Menu = Menu(self)
@@ -53,6 +52,10 @@ class Main:
         
         # Глобальное время для синхронизации анимаций (вращение фона)
         self.global_time = 0.0
+        
+        # Система шейдеров (инициализируется после Display)
+        self.Shaders = PyGameShaders(self.Disp.width, self.Disp.height)
+        self._load_shader_settings()
 
     def start(self):
 
@@ -175,29 +178,23 @@ class Main:
                 # Обновляем музыку (проверяем окончание треков)
                 self.AudioManager.update()
                 
-                # Обновляем частицы
-                dt = self.clock.get_time()
-                self.VisualEffects.update_particles(dt)
-                
-                # Рисуем частицы
-                self.VisualEffects.draw_particles(self.Disp.screen)
-                
                 # Рисуем dev menu поверх всего
                 self.DevMenu.draw(self)
                 
-                # Применяем визуальные эффекты (пост-процессинг)
-                processed_screen = self.VisualEffects.apply_effects(self.Disp.screen)
-                
-                # Применяем screen shake
-                shake_offset = self.VisualEffects.get_screen_shake_offset()
-                if shake_offset != (0, 0):
-                    # Временный экран с offset
-                    temp = pygame.Surface((self.Disp.width, self.Disp.height))
-                    temp.fill((0, 0, 0))
-                    temp.blit(processed_screen, shake_offset)
-                    self.Disp.screen.blit(temp, (0, 0))
-                else:
-                    self.Disp.screen.blit(processed_screen, (0, 0))
+                # Применяем шейдеры постобработки перед финальным flip
+                # (только для сцены игры, в меню не применяем для производительности)
+                if self.scene == 'game' or self.scene == 'settings' or self.scene == 'multiplayer':
+                    # Обновляем screen shake
+                    self.Shaders.update_shake(dt)
+                    
+                    # Захватываем текущий экран
+                    screen_capture = self.Disp.screen.copy()
+                    
+                    # Применяем все эффекты
+                    processed = self.Shaders.render(screen_capture)
+                    
+                    # Рисуем обработанную версию
+                    self.Disp.screen.blit(processed, self.Shaders.shake_offset)
                 
                 pygame.display.flip()
                 
@@ -235,6 +232,82 @@ class Main:
             print(f"Исходная ошибка: {error_info}")
             self.ErrorHandler.clear_error()
     
+    def _load_shader_settings(self):
+        """Загружает настройки шейдеров из конфига"""
+        try:
+            shader_config = self.config.get('shaders', {})
+            
+            if not shader_config:
+                print("⚠️ [Shaders] Настройки не найдены в config.json, используются значения по умолчанию")
+                return
+            
+            # Применяем все настройки
+            self.Shaders.set_vignette(
+                shader_config.get('vignette_enabled', True),
+                shader_config.get('vignette_intensity', 0.5)
+            )
+            
+            self.Shaders.set_bloom(
+                shader_config.get('bloom_enabled', False),
+                shader_config.get('bloom_intensity', 0.3),
+                shader_config.get('bloom_threshold', 200)
+            )
+            
+            self.Shaders.set_color_grading(
+                shader_config.get('color_grading_enabled', False),
+                shader_config.get('saturation', 1.0),
+                shader_config.get('brightness', 1.0),
+                shader_config.get('contrast', 1.0)
+            )
+            
+            self.Shaders.set_chromatic_aberration(
+                shader_config.get('chromatic_aberration_enabled', False),
+                shader_config.get('aberration_amount', 2.0)
+            )
+            
+            self.Shaders.set_pixelation(
+                shader_config.get('pixelation_enabled', False),
+                shader_config.get('pixel_size', 4)
+            )
+            
+            self.Shaders.set_crt(
+                shader_config.get('crt_enabled', False),
+                shader_config.get('scanline_intensity', 0.3)
+            )
+            
+            print("✅ [Shaders] Настройки загружены из config.json")
+            
+        except Exception as e:
+            print(f"⚠️ [Shaders] Ошибка загрузки настроек: {e}")
+    
+    def save_shader_settings(self):
+        """Сохраняет текущие настройки шейдеров в конфиг"""
+        try:
+            if 'shaders' not in self.config:
+                self.config['shaders'] = {}
+            
+            self.config['shaders']['vignette_enabled'] = self.Shaders.vignette_enabled
+            self.config['shaders']['vignette_intensity'] = self.Shaders.vignette_intensity
+            self.config['shaders']['bloom_enabled'] = self.Shaders.bloom_enabled
+            self.config['shaders']['bloom_intensity'] = self.Shaders.bloom_intensity
+            self.config['shaders']['bloom_threshold'] = self.Shaders.bloom_threshold
+            self.config['shaders']['color_grading_enabled'] = self.Shaders.color_grading_enabled
+            self.config['shaders']['saturation'] = self.Shaders.saturation
+            self.config['shaders']['brightness'] = self.Shaders.brightness
+            self.config['shaders']['contrast'] = self.Shaders.contrast
+            self.config['shaders']['chromatic_aberration_enabled'] = self.Shaders.chromatic_aberration_enabled
+            self.config['shaders']['aberration_amount'] = self.Shaders.aberration_amount
+            self.config['shaders']['pixelation_enabled'] = self.Shaders.pixelation_enabled
+            self.config['shaders']['pixel_size'] = self.Shaders.pixel_size
+            self.config['shaders']['crt_enabled'] = self.Shaders.crt_enabled
+            self.config['shaders']['scanline_intensity'] = self.Shaders.scanline_intensity
+            
+            self.JsonManager.save("data/config", self.config)
+            print("💾 [Shaders] Настройки сохранены")
+            
+        except Exception as e:
+            print(f"⚠️ [Shaders] Ошибка сохранения настроек: {e}")
+    
     def stop(self):
         
         # Останавливаем голосовой чат если активен
@@ -248,6 +321,10 @@ class Main:
         # Сохраняем настройки звука
         self.config['music_volume'] = self.AudioManager.music_volume
         self.config['sfx_volume'] = self.AudioManager.sfx_volume
+        
+        # Сохраняем настройки шейдеров
+        if hasattr(self, 'Shaders'):
+            self.save_shader_settings()
         
         self.JsonManager.save("data/config",self.config)
         pygame.quit()

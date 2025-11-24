@@ -204,6 +204,9 @@ class Game:
         self.fog_of_war_duration = 0
     
     def main(self,m):
+        
+        # Экспорт состояния для чита
+        self.export_game_state(m)
 
         self.key_input(m)
         # Обновляем эффект тряски экрана
@@ -479,23 +482,18 @@ class Game:
             # Создаем эффект распада съеденной фигуры
             m.Disp.Game.create_destruction_effect(m, (to_x, to_y), captured_piece)
             
-            # Визуальные эффекты при взятии фигуры
-            if hasattr(m, 'VisualEffects'):
-                # Конвертируем позицию на доске в экранные координаты
-                screen_x = m.Disp.width // 2 + (to_x - 3.5) * 80
-                screen_y = m.Disp.height // 2 + (to_y - 3.5) * 80
+            # === ЭФФЕКТ: Screen Shake при взятии фигуры ===
+            if hasattr(m, 'Shaders'):
+                # Сила тряски зависит от важности фигуры
+                shake_intensity = 5.0
+                if 'king' in captured_piece:
+                    shake_intensity = 20.0
+                elif 'queen' in captured_piece:
+                    shake_intensity = 15.0
+                elif 'rook' in captured_piece:
+                    shake_intensity = 10.0
                 
-                # Цвет частиц зависит от команды
-                particle_color = (255, 200, 200) if 'white' in captured_piece else (100, 100, 100)
-                
-                # Создаем взрыв частиц
-                m.VisualEffects.create_explosion_particles(screen_x, screen_y, count=15, color=particle_color)
-                
-                # Тряска экрана (сильнее для важных фигур)
-                if 'queen' in captured_piece or 'king' in captured_piece:
-                    m.VisualEffects.trigger_screen_shake(intensity=12, duration=400)
-                else:
-                    m.VisualEffects.trigger_screen_shake(intensity=6, duration=250)
+                m.Shaders.trigger_shake(duration=0.3, intensity=shake_intensity)
             
             # Проверяем, съедается ли король
             if captured_piece.endswith('_king'):
@@ -505,12 +503,12 @@ class Game:
                 self.winner = winner
                 print(f"🎉 ИГРА ОКОНЧЕНА! {winner.upper()} ПОБЕДИЛ!")
                 
-                # Мощный эффект при победе
-                if hasattr(m, 'VisualEffects'):
-                    screen_x = m.Disp.width // 2 + (to_x - 3.5) * 80
-                    screen_y = m.Disp.height // 2 + (to_y - 3.5) * 80
-                    m.VisualEffects.create_explosion_particles(screen_x, screen_y, count=50, color=(255, 215, 0))
-                    m.VisualEffects.trigger_screen_shake(intensity=20, duration=800)
+                # === ЭФФЕКТ: Bloom + Chromatic Aberration при победе ===
+                if hasattr(m, 'Shaders'):
+                    m.Shaders.bloom_enabled = True
+                    m.Shaders.bloom_intensity = 0.6
+                    m.Shaders.chromatic_aberration_enabled = True
+                    m.Shaders.aberration_amount = 3.0
         
         # Перемещаем фигуру
         piece = self.cells[from_x][from_y]['value']
@@ -857,6 +855,41 @@ class Game:
                 self.cells[x][y]['status'] = original_statuses[(x, y)]
         
         return can_attack
+    
+    def export_game_state(self, m):
+        """Экспортирует текущее состояние игры для чита"""
+        try:
+            import json
+            import os
+            
+            # Создаем директорию если нет
+            export_dir = os.path.join('data', 'cheat_export')
+            os.makedirs(export_dir, exist_ok=True)
+            
+            # Собираем состояние доски
+            board_state = []
+            for x in range(8):
+                row = []
+                for y in range(8):
+                    row.append(self.cells[x][y]['value'])
+                board_state.append(row)
+            
+            # Формируем данные
+            game_state = {
+                'board': board_state,
+                'current_player': self.current_player,
+                'game_started': self.game_started,
+                'game_over': self.game_over,
+                'winner': self.winner
+            }
+            
+            # Сохраняем в файл
+            export_file = os.path.join(export_dir, 'game_state.json')
+            with open(export_file, 'w', encoding='utf-8') as f:
+                json.dump(game_state, f)
+        except Exception as e:
+            # Игнорируем ошибки экспорта чтобы не ломать игру
+            pass
     
     def is_point_in_polygon(self,point:tuple,polygon:list) -> bool:
         
